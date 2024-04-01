@@ -1,0 +1,9 @@
+# ignore files:
+tracks/*
+
+# ignore directories:
+
+# keep files:
+
+# keep directories:
+!tracks/.gitkeep
