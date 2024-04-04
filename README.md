@@ -1,6 +1,6 @@
-# Lastfm Player
+# last.fm Player
 A university project for the Programming paradigms course. <br>
-A GUI music player written in Go that uses the last.fm API to download a user's `mix.json` file, parses it and downloads and plays the tracks. <br> **A work in progress**.
+A GUI music player written in Go that uses the [last.fm](https://www.last.fm/) API to download a user's `mix.json` file, parses it and downloads and plays the tracks. <br> **A work in progress**.
 
 ## To-do
 In order of implementation:

@@ -43,8 +43,6 @@ func pushFront(pair Pair) {
 			next
 		*/
 	}
-
-	// fmt.Println(downloadQueue.first)
 	// if this is the first node, change the value of empty and
 	// set the last node to point to the first node
 	if downloadQueue.empty {
@@ -53,7 +51,7 @@ func pushFront(pair Pair) {
 			downloadQueue.last = downloadQueue.first
 			downloadQueue.empty = false
 		} else {
-			fmt.Println("ERROR[pushFront]: didn't create a new node")
+			fmt.Println("ERROR[pushFront]: did not create a new node")
 		}
 	}
 	// increment size
@@ -93,7 +91,7 @@ func pushBack(pair Pair) {
 			downloadQueue.first = downloadQueue.last
 			downloadQueue.empty = false
 		} else {
-			fmt.Println("ERROR[pushBack]: didn't create a new node")
+			fmt.Println("ERROR[pushBack]: did not create a new node")
 		}
 	}
 	// increment size

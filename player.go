@@ -110,8 +110,8 @@ func playThread() {
 			// 4. if unavailable, send to download queue and wait on semaphore
 		} else {
 			// send to front of the queue
-			track := Pair{idx: id, priority: true}
-			pushFront(track)
+			request := Pair{idx: id, priority: true}
+			pushFront(request)
 			// signal the downloadThread to proceed
 			fmt.Println("INFO[playThread]: requesting download of track", playlist[id].ID)
 			dldChannel <- true

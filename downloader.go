@@ -50,7 +50,7 @@ func downloadThread() {
 		// 3. signal playThread to play
 		fmt.Println("INFO[downloadThread]: signaling to playThread to start playing")
 		playChannel <- 1
-		// // 4. send next 3 tracks to the back of the queue for in advance download
+		// 4. send next 3 tracks to the back of the queue for in advance download
 		sent := 0
 		for id := request.idx + 1; id < request.idx+4 && id < len(playlist); id++ {
 			trackLocation := getTrackLocation(playlist[id].ID)
@@ -71,16 +71,19 @@ func downloadThread() {
 
 func downloadTracksAhead(nr int) {
 	for i := 0; i < nr && !isEmpty(); i++ {
-		// certainly won't be empty, because the moment it is empty,
+		// certainly won't be empty, because if it is empty,
 		// the loop condition is unsatisfied and we exit the loop
 		pair, _ := readBack()
+		// if pair.priority == true, it was explicitly requested by the user. this is
+		// handled in downloadQueue, so we exit because it was added to the front,
+		// while here we handle tracks added from the back and therefore none such are left.
 		if pair.priority {
 			break
 		}
 
+		popBack()
 		fmt.Println("INFO[downloadAhead]: downloading", playlist[pair.idx].ID)
 		var err error
-		popBack()
 		downloadTrack(playlist[pair.idx].ID, &err)
 		if err != nil {
 			fmt.Println("WARNING[download ahead]: could not download", playlist[pair.idx].ID)
