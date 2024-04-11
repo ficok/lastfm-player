@@ -7,3 +7,6 @@ tracks/*
 
 # keep directories:
 !tracks/.gitkeep
+
+#ignore binary
+lastfm-player
