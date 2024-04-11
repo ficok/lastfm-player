@@ -1,5 +1,7 @@
 # ignore files:
 tracks/*
+lastfm-player
+mix.json
 
 # ignore directories:
 
@@ -7,6 +9,3 @@ tracks/*
 
 # keep directories:
 !tracks/.gitkeep
-
-#ignore binary
-lastfm-player
