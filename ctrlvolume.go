@@ -10,7 +10,7 @@ type CtrlVolume struct {
 	Title    string
 	Artist   string
 	ID       string
-	Streamer beep.Streamer
+	Streamer beep.StreamSeeker
 	Paused   bool
 	Base     float64
 	Volume   float64

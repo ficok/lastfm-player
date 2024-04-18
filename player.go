@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"fyne.io/fyne/v2/theme"
-	"github.com/gopxl/beep"
 	"github.com/gopxl/beep/mp3"
 	"github.com/gopxl/beep/speaker"
-	gomp3 "github.com/hajimehoshi/go-mp3"
 )
 
 func playTrack(track Track) {
@@ -32,19 +31,25 @@ func playTrack(track Track) {
 	playerCtrl.Artist = track.Artist
 	playerCtrl.ID = track.ID
 
+	artistNameText.Set(track.Artist)
+	trackTitleText.Set(track.Title)
+
 	// clear any playing song from the speaker
 	speaker.Clear()
 
 	// get new track sample rate and update the speaker SR if needed
-	decodedStream, err := gomp3.NewDecoder(f)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if decodedStream.SampleRate() != int(sampleRate) {
-		playerCtrl.Streamer = beep.Resample(4, beep.SampleRate(decodedStream.SampleRate()), sampleRate, streamer)
-	} else {
-		playerCtrl.Streamer = streamer
-	}
+	// decodedStream, err := gomp3.NewDecoder(f)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if decodedStream.SampleRate() != int(sampleRate) {
+	// 	playerCtrl.Streamer = beep.Resample(4, beep.SampleRate(decodedStream.SampleRate()), sampleRate, streamer)
+	// } else {
+	// 	playerCtrl.Streamer = streamer
+	// }
+
+	//TODO: cannot use Resample, it can't convert to StreamSeeker that we need for current position in track/total track length
+	playerCtrl.Streamer = streamer
 
 	speaker.Play(playerCtrl)
 	setPauseStatus(false)
@@ -128,4 +133,31 @@ func playThread() {
 			playTrack(playlist[playlistIndex])
 		}
 	}
+}
+
+func trackTime() {
+	for {
+		if playerCtrl.Streamer == nil {
+			continue
+		}
+
+		currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+
+		currentTime := getTimeString(currentTimeInt)
+		totalTime := getTimeString(totalTimeInt)
+
+		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+	}
+}
+
+func getTimeString(time int) string {
+	minutes := fmt.Sprint(time / 60)
+	seconds := fmt.Sprint(time % 60)
+
+	if len(seconds) == 1 {
+		seconds = "0" + seconds
+	}
+
+	return fmt.Sprint(minutes, ":", seconds)
 }

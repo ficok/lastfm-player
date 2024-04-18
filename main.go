@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+
 	// "errors"
 	"fmt"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gopxl/beep"
@@ -35,7 +37,7 @@ type Pair struct {
 	priority bool
 }
 
-const APP_WIDTH = 500
+const APP_WIDTH = 800
 const APP_HEIGHT = 500
 
 // player controller - current playing track info
@@ -62,6 +64,9 @@ var playlistIndex int = -1
 // play and download thread sync channels
 var playChannel chan int
 var dldChannel chan bool
+
+var artistNameText, trackTitleText, trackTimeText binding.String
+var artistNameTextBox, trackTitleTextBox, trackTimeTextBox *widget.Label
 
 // read playlist JSON and return a slice of tracks
 // TODO: replace with call to get new playlist
@@ -162,6 +167,19 @@ func main() {
 	// start play and download threads
 	go downloadThread()
 	go playThread()
+	go trackTime()
+
+	artistNameText = binding.NewString()
+	trackTitleText = binding.NewString()
+	trackTimeText = binding.NewString()
+
+	artistNameTextBox = widget.NewLabelWithData(artistNameText)
+	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
+	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
+
+	nowPlayingWindow := container.NewVBox(artistNameTextBox, trackTitleTextBox, trackTimeTextBox)
+
+	upperPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
 
 	// func to run when list object is selected
 	playlistList.OnSelected = playlistSelect
@@ -176,7 +194,7 @@ func main() {
 		nextTrackBtn,
 	)
 
-	mainPnl := container.NewBorder(nil, buttonPnl, nil, nil, playlistList)
+	mainPnl := container.NewBorder(nil, buttonPnl, nil, nil, upperPanel)
 
 	mainWindow.SetContent(mainPnl)
 
