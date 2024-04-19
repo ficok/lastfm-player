@@ -10,4 +10,4 @@ mix.json
 
 # keep directories:
 !tracks/.gitkeep
-!covers/blank.png
+!covers/missing.png
