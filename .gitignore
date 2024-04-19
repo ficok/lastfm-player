@@ -1,5 +1,6 @@
 # ignore files:
 tracks/*
+covers/*
 lastfm-player
 mix.json
 
@@ -9,3 +10,4 @@ mix.json
 
 # keep directories:
 !tracks/.gitkeep
+!covers/blank.png

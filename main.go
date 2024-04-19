@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"image"
 
 	// "errors"
 	"fmt"
@@ -13,6 +15,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/theme"
@@ -48,8 +51,9 @@ var downloadQueue *DoubleList
 
 var sampleRate = beep.SampleRate(48000)
 
-var tracksDir string = "tracks"
-var outputFilename string = fmt.Sprintf("%s/%%(id)s", tracksDir)
+var tracksDir string = "tracks/"
+var coversDir string = "covers/"
+var outputFilename string = fmt.Sprintf("%s%%(id)s", tracksDir)
 
 // global GUI elements
 var playlistList *widget.List
@@ -67,6 +71,8 @@ var dldChannel chan bool
 
 var artistNameText, trackTitleText, trackTimeText binding.String
 var artistNameTextBox, trackTitleTextBox, trackTimeTextBox *widget.Label
+var coverArtImage *canvas.Image
+var blankImage image.Image
 
 // read playlist JSON and return a slice of tracks
 // TODO: replace with call to get new playlist
@@ -100,7 +106,7 @@ func readPlaylist() []Track {
 		trackIDQuery, _ := gojq.Parse(".playlinks[0].id")
 		trackID, _ := trackIDQuery.Run(trackMap).Next()
 
-		newTrack := Track{trackTitle.(string), trackArtist.(string), trackID.(string)}
+		newTrack := Track{Title: trackTitle.(string), Artist: trackArtist.(string), ID: trackID.(string)}
 		playlistSlice = append(playlistSlice, newTrack)
 	}
 
@@ -109,7 +115,7 @@ func readPlaylist() []Track {
 
 // get track filename from videoID
 func getTrackLocation(videoID string) string {
-	return fmt.Sprint(tracksDir, "/", videoID, ".mp3")
+	return fmt.Sprint(tracksDir, videoID, ".mp3")
 }
 
 func playlistSelect(idx int) {
@@ -173,11 +179,20 @@ func main() {
 	trackTitleText = binding.NewString()
 	trackTimeText = binding.NewString()
 
+	blankImageBytes, err := os.ReadFile(coversDir + "missing.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	blankImage, _, _ = image.Decode(bytes.NewReader(blankImageBytes))
+
+	coverArtImage = canvas.NewImageFromImage(nil)
+	coverArtImage.FillMode = canvas.ImageFillOriginal
 	artistNameTextBox = widget.NewLabelWithData(artistNameText)
 	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
 	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
 
-	nowPlayingWindow := container.NewVBox(artistNameTextBox, trackTitleTextBox, trackTimeTextBox)
+	// nowPlayingWindow := container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox)
+	nowPlayingWindow := container.NewCenter(container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox))
 
 	upperPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
 
