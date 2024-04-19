@@ -3,6 +3,7 @@ tracks/*
 covers/*
 lastfm-player
 mix.json
+config.toml
 
 # ignore directories:
 

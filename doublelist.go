@@ -19,6 +19,11 @@ type Node struct {
 	next     *Node
 }
 
+type Pair struct {
+	idx      int
+	priority bool
+}
+
 func pushFront(pair Pair) {
 	// create a new node
 	var oldFirst *Node
