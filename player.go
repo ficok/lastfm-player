@@ -105,11 +105,43 @@ func previousTrack() {
 	playlistList.Select(playlistIndex - 1)
 }
 
+func seekForward() {
+	if playerCtrl.Streamer == nil {
+		return
+	}
+
+	currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+	totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+
+	if currentTimeInt+5 >= totalTimeInt {
+		return
+	}
+
+	playerCtrl.Streamer.Seek(playerCtrl.Streamer.Position() + 5*sampleRate.N(time.Second))
+}
+
+func seekBackward() {
+	if playerCtrl.Streamer == nil {
+		return
+	}
+
+	currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+
+	if currentTimeInt-5 <= 0 {
+		playerCtrl.Streamer.Seek(0)
+	} else {
+		playerCtrl.Streamer.Seek(playerCtrl.Streamer.Position() - 5*sampleRate.N(time.Second))
+	}
+}
+
 func playThread() {
 	for {
 		fmt.Println("INFO[playThread]: waiting for play request")
+		// while waiting, timeThread can keep on working
 		// 1. wait for a new play request
 		id := <-playChannel
+		// when a new song is requested, timeChannel is blocked until the song starts
+		timeChannelStop <- true
 		fmt.Println("INFO[playThread]: started working")
 		// 2. stat the file
 		trackLocation := getTrackLocation(playlist[id].ID)
@@ -117,6 +149,8 @@ func playThread() {
 		if _, statErr := os.Stat(trackLocation); statErr == nil {
 			setPlaylistIndex(id)
 			playTrack(playlist[playlistIndex])
+			// start the time thread
+			timeChannelGo <- true
 
 			// 4. if unavailable, send to download queue and wait on semaphore
 		} else {
@@ -137,12 +171,20 @@ func playThread() {
 			fmt.Println("INFO[playThread]: finally playing!")
 			setPlaylistIndex(id)
 			playTrack(playlist[playlistIndex])
+			// start the time thread
+			timeChannelGo <- true
 		}
 	}
 }
 
 func trackTime() {
 	for {
+		select {
+		case <-timeChannelStop:
+			<-timeChannelGo
+		default:
+		}
+
 		// printing currently playing time info
 		if playerCtrl.Streamer == nil {
 			continue
@@ -157,8 +199,8 @@ func trackTime() {
 		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
 
 		// playing the next song
-		if currentTimeInt == totalTimeInt {
-			nextTrack()
+		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {
+			playlistList.Select(playlistIndex + 1)
 		}
 	}
 }

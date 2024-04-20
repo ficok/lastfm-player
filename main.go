@@ -34,6 +34,8 @@ var configFile string = "config.toml"
 // play and download thread sync channels
 var playChannel chan int
 var dldChannel chan bool
+var timeChannelGo chan bool
+var timeChannelStop chan bool
 
 func init() {
 	// init speaker
@@ -62,6 +64,8 @@ func init() {
 	// initialize communication channels
 	dldChannel = make(chan bool, 1)
 	playChannel = make(chan int, 1)
+	timeChannelGo = make(chan bool, 1)
+	timeChannelStop = make(chan bool, 1)
 
 	// start play and download threads
 	go downloadThread()

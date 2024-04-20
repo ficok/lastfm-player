@@ -23,6 +23,7 @@ var coverArtImage *canvas.Image
 var blankImage image.Image
 var playlistList *widget.List
 var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
+var seekFwdBtn, seekBwdBtn *widget.Button
 
 func initGUI() {
 	mainWindow = mainApp.NewWindow("LastFM Player")
@@ -78,11 +79,15 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekForward)
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBackward)
 
-	buttonPnl := container.NewGridWithColumns(3,
+	buttonPnl := container.NewGridWithColumns(5,
+		seekBwdBtn,
 		previousTrackBtn,
 		playPauseBtn,
 		nextTrackBtn,
+		seekFwdBtn,
 	)
 
 	mainPnl := container.NewBorder(nil, buttonPnl, nil, nil, upperPanel)
