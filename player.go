@@ -143,6 +143,7 @@ func playThread() {
 
 func trackTime() {
 	for {
+		// printing currently playing time info
 		if playerCtrl.Streamer == nil {
 			continue
 		}
@@ -154,6 +155,11 @@ func trackTime() {
 		totalTime := getTimeString(totalTimeInt)
 
 		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+
+		// playing the next song
+		if currentTimeInt == totalTimeInt {
+			nextTrack()
+		}
 	}
 }
 
