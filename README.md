@@ -10,8 +10,9 @@ In relative order of implementation:
 - [x] polish dld and player threads 
 - [x] polish double list 
 - [x] download in advance
-- [ ] download and parse the `mix.json` for a specific user
-- [ ] play next track automatically after the current one has ended
+- [x] download and parse the `mix.json` for a specific user
+- [x] play next track automatically after the current one has ended
+- [x] seeking
 - [ ] fix streamer struct to support both Len/Position and Resampling
 - [x] currently playing song info: track title, artist name, elapsed/duration, album art
 - [ ] move list to left and have song info on the right, buttons on the bottom

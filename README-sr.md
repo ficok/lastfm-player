@@ -11,8 +11,9 @@ U pribliznom redosledu implementiranja:
 - [x] poliranje download i player thread funkcija
 - [x] poliranje double list strukture i funkcija
 - [x] skidanje unapred
-- [ ] skidanje i parsiranje `mix.json` fajla za konkretnog korisnika
-- [ ] automatsko pustanje naredne pesme nakon sto se trenutna zavrsi
+- [x] skidanje i parsiranje `mix.json` fajla za konkretnog korisnika
+- [x] automatsko pustanje naredne pesme nakon sto se trenutna zavrsi
+- [x] seeking
 - [ ] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
 - [ ] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
 - [ ] kontrole za jacinu zvuka i prikaza
