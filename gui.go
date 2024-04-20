@@ -67,6 +67,7 @@ func initGUI() {
 	artistNameTextBox = widget.NewLabelWithData(artistNameText)
 	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
 	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
+	coverArtImage.Image = blankImage
 
 	nowPlayingWindow := container.NewCenter(container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox))
 
