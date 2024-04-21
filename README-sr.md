@@ -17,7 +17,7 @@ U pribliznom redosledu implementiranja:
 - [x] kontrole na tastaturi
 - [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
 - [ ] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
-- [ ] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
+- [x] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
 - [ ] kontrole za jacinu zvuka i prikaza
 - [ ] prikazi progres skidanja i indikator za skinute pesme
 - [ ] opcija za skrivanje i prikazivanje plejliste

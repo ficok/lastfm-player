@@ -17,7 +17,7 @@ In relative order of implementation:
 - [x] currently playing song info: track title, artist name, elapsed/duration, album art
 - [x] keyboard media control
 - [ ] keyboard control overhaul (use without mod key)
-- [ ] move list to left and have song info on the right, buttons on the bottom
+- [x] move list to left and have song info on the right, buttons on the bottom
 - [ ] add volume control/display
 - [ ] show download progress/downloaded indicator
 - [ ] change playlist panel size/just track info screen
