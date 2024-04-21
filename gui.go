@@ -76,6 +76,9 @@ func initGUI() {
 
 	playlistList.OnSelected = playlistSelect
 
+	// setting shortcuts
+	initializeAndSetShortcuts()
+
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
