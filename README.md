@@ -15,13 +15,14 @@ In relative order of implementation:
 - [x] seeking
 - [ ] fix streamer struct to support both Len/Position and Resampling
 - [x] currently playing song info: track title, artist name, elapsed/duration, album art
+- [x] keyboard media control
+- [ ] keyboard control overhaul (use without mod key)
 - [ ] move list to left and have song info on the right, buttons on the bottom
 - [ ] add volume control/display
 - [ ] show download progress/downloaded indicator
 - [ ] change playlist panel size/just track info screen
 - [ ] refresh playlist
 - [ ] download new mix in advance, append to the current
-- [ ] keyboard media control
 - [ ] visualizer
 - [ ] delete tracks automatically
 - [ ] play opus/webm file directly (if possible)

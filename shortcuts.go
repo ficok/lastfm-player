@@ -41,7 +41,6 @@ func initializeAndSetShortcuts() {
 func handleInput(sc fyne.Shortcut) {
 	tokens := strings.Split(string(sc.ShortcutName()), "+")
 	key := tokens[len(tokens)-1]
-
 	// fmt.Println("DEBUG[handleInput]: shortcut:", key)
 
 	switch key {

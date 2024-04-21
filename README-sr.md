@@ -14,6 +14,8 @@ U pribliznom redosledu implementiranja:
 - [x] skidanje i parsiranje `mix.json` fajla za konkretnog korisnika
 - [x] automatsko pustanje naredne pesme nakon sto se trenutna zavrsi
 - [x] seeking
+- [x] kontrole na tastaturi
+- [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
 - [ ] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
 - [ ] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
 - [ ] kontrole za jacinu zvuka i prikaza
@@ -21,7 +23,6 @@ U pribliznom redosledu implementiranja:
 - [ ] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste
 - [ ] skidanje novog miksa unapred i nalepljivanje na kraj trenutnog
-- [ ] kontrole na tastaturi
 - [ ] vizuelizacija
 - [ ] automatsko brisanje pesama
 - [ ] direktno pustanje opus/webm fajlova (ukoliko je moguce)
