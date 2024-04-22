@@ -15,14 +15,17 @@ U pribliznom redosledu implementiranja:
 - [x] automatsko pustanje naredne pesme nakon sto se trenutna zavrsi
 - [x] seeking
 - [x] kontrole na tastaturi
-- [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
-- [ ] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
+- [x] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
 - [x] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
-- [ ] kontrole za jacinu zvuka i prikaza
+- [x] kontrole za jacinu zvuka
+- [ ] prikaz zvuka
+- [ ] panel sa podesavanjima
 - [ ] prikazi progres skidanja i indikator za skinute pesme
 - [ ] opcija za skrivanje i prikazivanje plejliste
-- [ ] osvezavanje plejliste
+- [ ] osvezavanje plejliste (uz brisanje starih pesama)
 - [ ] skidanje novog miksa unapred i nalepljivanje na kraj trenutnog
+**Mozda**
+- [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
 - [ ] vizuelizacija
 - [ ] automatsko brisanje pesama
 - [ ] direktno pustanje opus/webm fajlova (ukoliko je moguce)
