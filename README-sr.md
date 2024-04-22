@@ -27,6 +27,7 @@ U pribliznom redosledu implementiranja:
 
 <br>
 **Mozda**
+
 - [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
 - [ ] vizuelizacija
 - [ ] automatsko brisanje pesama

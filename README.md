@@ -26,7 +26,8 @@ In relative order of implementation:
 - [ ] download new mix in advance, append to the current
 
 <br>
-**Maybe**
+*Maybe*
+
 - [ ] keyboard control overhaul (use without mod key)
 - [ ] visualizer
 - [ ] delete tracks automatically
