@@ -24,9 +24,9 @@ U pribliznom redosledu implementiranja:
 - [ ] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste (uz brisanje starih pesama)
 - [ ] skidanje novog miksa unapred i nalepljivanje na kraj trenutnog
-
 <br>
-**Mozda**
+
+*Mozda*
 
 - [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
 - [ ] vizuelizacija

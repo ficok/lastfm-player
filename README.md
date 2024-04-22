@@ -24,8 +24,8 @@ In relative order of implementation:
 - [ ] change playlist panel size/just track info screen
 - [ ] refresh playlist (and delete old tracks`)
 - [ ] download new mix in advance, append to the current
-
 <br>
+
 *Maybe*
 
 - [ ] keyboard control overhaul (use without mod key)
