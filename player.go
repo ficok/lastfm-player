@@ -83,6 +83,11 @@ func setPauseStatus(paused bool) {
 
 // wrapper func for setPauseStatus to toggle status
 func togglePlay() {
+	if playlistIndex == -1 {
+		nextTrack()
+		return
+	}
+
 	setPauseStatus(!playerCtrl.Paused)
 }
 
