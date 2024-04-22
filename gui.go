@@ -24,6 +24,7 @@ var blankImage image.Image
 var playlistList *widget.List
 var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
 var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
+var quitBtn, refreshBtn, logoutBtn *widget.Button
 var volumeSlider *widget.Slider
 
 func initGUI() {
@@ -89,11 +90,13 @@ func initGUI() {
 
 	// SETTINGS PANEL
 	// settings panel buttons
-	quitBtn := widget.NewButtonWithIcon("", theme.CancelIcon(), blank)
-	logoutBtn := widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
-	refreshBtn := widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
+	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), blank)
+	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
+	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
+
+	settingsBtns := container.NewGridWithColumns(5, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn)
 
 	// volume slider
 	volumeSlider = widget.NewSlider(MIN_VOLUME, MAX_VOLUME)
@@ -103,7 +106,7 @@ func initGUI() {
 		playerCtrl.setVolume(value)
 	}
 
-	settingsPanel := container.NewGridWithColumns(6, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn, volumeSlider)
+	settingsPanel := container.NewGridWithColumns(2, settingsBtns, volumeSlider)
 
 	// MEDIA PANEL
 	// media control buttons

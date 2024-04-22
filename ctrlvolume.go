@@ -63,12 +63,22 @@ func (cv *CtrlVolume) raiseVolume() {
 		volumeSlider.Value = cv.Volume
 		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
 		volumeSlider.Refresh()
+	} else {
+		cv.Volume = MAX_VOLUME
+		volumeSlider.Value = cv.Volume
+		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+		volumeSlider.Refresh()
 	}
 }
 
 func (cv *CtrlVolume) lowerVolume() {
 	if cv.Volume-volumeStep >= MIN_VOLUME {
 		cv.Volume -= volumeStep
+		volumeSlider.Value = cv.Volume
+		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+		volumeSlider.Refresh()
+	} else {
+		cv.Volume = MIN_VOLUME
 		volumeSlider.Value = cv.Volume
 		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
 		volumeSlider.Refresh()
