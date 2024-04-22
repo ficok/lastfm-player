@@ -18,8 +18,9 @@ U pribliznom redosledu implementiranja:
 - [x] informacije o pesmi koja se trenutno pusta: ime pesme, izvodjaca, vreme trajanja/ukupno vreme, slika albuma
 - [x] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
 - [x] kontrole za jacinu zvuka
-- [ ] prikaz zvuka
+- [x] prikaz zvuka (slajder za zvuk)
 - [x] panel sa podesavanjima
+- [ ] pri logovanju/ulasku u program, odmah skini prvu pesmu
 - [ ] prikazi progres skidanja i indikator za skinute pesme
 - [ ] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste (uz brisanje starih pesama)
