@@ -18,10 +18,11 @@ type CtrlVolume struct {
 	Silent   bool
 }
 
-var volumeStep = 0.2
-var baseVolume = 100
+var volumeStep float64 = 0.2
 
-const MIN_VOLUME, MAX_VOLUME = 0, 150
+// var baseVolume = 100
+
+const MIN_VOLUME, MAX_VOLUME float64 = -2.0, 2.0
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -57,15 +58,25 @@ func (cv *CtrlVolume) Err() error {
 }
 
 func (cv *CtrlVolume) raiseVolume() {
-	fmt.Println("INFO[ctrlVolume]: volume is", cv.Volume)
-	if cv.Volume+volumeStep <= 2.0 {
+	if cv.Volume+volumeStep <= MAX_VOLUME {
 		cv.Volume += volumeStep
+		volumeSlider.Value = cv.Volume
+		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+		volumeSlider.Refresh()
 	}
 }
 
 func (cv *CtrlVolume) lowerVolume() {
-	fmt.Println("INFO[ctrlVolume]: volume is", cv.Volume)
-	if cv.Volume-volumeStep >= -2.9 {
+	if cv.Volume-volumeStep >= MIN_VOLUME {
 		cv.Volume -= volumeStep
+		volumeSlider.Value = cv.Volume
+		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+		volumeSlider.Refresh()
 	}
+}
+
+func (cv *CtrlVolume) setVolume(value float64) {
+	cv.Volume = value
+	volumeSlider.SetValue(cv.Volume)
+	fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
 }

@@ -73,12 +73,14 @@ func init() {
 	go trackTime()
 
 	playlist = []Track{}
+
 }
 
 func main() {
 	mainApp = app.New()
 
 	initGUI()
+	initializeAndSetShortcuts()
 
 	if !validateConfig() {
 		loginWindow.Show()

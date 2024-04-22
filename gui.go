@@ -24,16 +24,20 @@ var blankImage image.Image
 var playlistList *widget.List
 var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
 var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
+var volumeSlider *widget.Slider
 
 func initGUI() {
+	// WINDOW INIT
+	// initializing the main window
 	mainWindow = mainApp.NewWindow("LastFM Player")
 	mainWindow.Resize(fyne.NewSize(APP_WIDTH, APP_HEIGHT))
 
+	// initializing the login window
 	loginWindow = mainApp.NewWindow("LastFM Player - Login")
 	loginWindow.Resize(fyne.NewSize(APP_WIDTH*0.5, APP_HEIGHT*0.2))
-
+	// creating a new entry for username input
 	usernameEntry := widget.NewEntry()
-
+	// creating the login form
 	loginForm := &widget.Form{
 		Items: []*widget.FormItem{ // we can specify items in the constructor
 			{Text: "Enter LastFM username", Widget: usernameEntry}},
@@ -48,11 +52,19 @@ func initGUI() {
 			mainWindow.Show()
 		},
 	}
-
+	// appending the login to the login window
 	loginWindow.SetContent(loginForm)
+	// ----------
 
+	// PLAYLIST CREATION
+	// creating the playlist widget
 	playlistList = widget.NewList(playlistLen, playlistCreateItem, playlistUpdateItem)
+	// setting the function that will be called when a playlist item is selected
+	playlistList.OnSelected = playlistSelect
+	// ----------
 
+	// TRACK INFO AND ALBUM ART
+	// creating track information
 	artistNameText = binding.NewString()
 	trackTitleText = binding.NewString()
 	trackTimeText = binding.NewString()
@@ -73,27 +85,9 @@ func initGUI() {
 	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
 	trackTimeTextBox.Alignment = fyne.TextAlignCenter
 	coverArtImage.Image = blankImage
+	// ----------
 
-	playlistList.OnSelected = playlistSelect
-
-	// setting shortcuts
-	initializeAndSetShortcuts()
-
-	// media control buttons
-	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
-	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
-	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
-
-	mediaBtnPnl := container.NewGridWithColumns(5,
-		seekBwdBtn,
-		previousTrackBtn,
-		playPauseBtn,
-		nextTrackBtn,
-		seekFwdBtn,
-	)
-
+	// SETTINGS PANEL
 	// settings panel buttons
 	quitBtn := widget.NewButtonWithIcon("", theme.CancelIcon(), blank)
 	logoutBtn := widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
@@ -101,21 +95,45 @@ func initGUI() {
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 
-	// top panel, with settings buttons
-	settingsPanel := container.NewGridWithColumns(5, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn)
+	// volume slider
+	volumeSlider = widget.NewSlider(MIN_VOLUME, MAX_VOLUME)
+	volumeSlider.Step = volumeStep
+	volumeSlider.SetValue(playerCtrl.Volume)
+	volumeSlider.OnChanged = func(value float64) {
+		playerCtrl.setVolume(value)
+	}
 
-	// volume buttons
+	settingsPanel := container.NewGridWithColumns(6, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn, volumeSlider)
 
-	// media panel
-	nowPlayingWindow := container.NewCenter(
-		container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, mediaBtnPnl),
+	// MEDIA PANEL
+	// media control buttons
+	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
+	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
+	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
+
+	mediaCtrlPnl := container.NewGridWithColumns(5,
+		seekBwdBtn,
+		previousTrackBtn,
+		playPauseBtn,
+		nextTrackBtn,
+		seekFwdBtn,
 	)
+
+	// setting the media panel content
+	nowPlayingWindow := container.NewCenter(
+		container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, mediaCtrlPnl),
+	)
+
+	// MAIN WINDOW
 	// panel with main objects: playlist, playing window
 	mainPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
 
 	// the general panel that will hold all the content
 	panelContents := container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
 
+	// appending everything to the mainWindow
 	mainWindow.SetContent(panelContents)
 }
 
