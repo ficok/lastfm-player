@@ -86,8 +86,8 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekForward)
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBackward)
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 

@@ -17,6 +17,8 @@ const LASTFM_API_KEY = "069b66ee4d6a7f5e860db3af52c19ab0"
 // player controller - current playing track info
 var playerCtrl *CtrlVolume
 
+var seekStep = 5
+
 func playTrack(track Track) {
 	trackLocation := getTrackLocation(track.ID)
 	f, err := os.Open(trackLocation)
@@ -105,33 +107,56 @@ func previousTrack() {
 	playlistList.Select(playlistIndex - 1)
 }
 
-func seekForward() {
+func seekFwd() {
 	if playerCtrl.Streamer == nil {
 		return
 	}
+	// lock the speaker. important because we're using the current position.
+	// if unlocked, it changes
+	speaker.Lock()
+	// getting the streamer info
+	currentPosition := playerCtrl.Streamer.Position()
+	totalLen := playerCtrl.Streamer.Len()
+	currentTimeInt := currentPosition / sampleRate.N(time.Second)
+	totalTimeInt := totalLen / sampleRate.N(time.Second)
 
-	currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-	totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
-
-	if currentTimeInt+5 >= totalTimeInt {
+	// if seeking get's us past the end of streamer, skip it
+	if currentTimeInt+seekStep >= totalTimeInt {
+		// don't forget to unlock streamer, otherwise it stops and
+		// we can't unlock it!
+		speaker.Unlock()
 		return
 	}
 
-	playerCtrl.Streamer.Seek(playerCtrl.Streamer.Position() + 5*sampleRate.N(time.Second))
+	// set the streamer's new position and unlock it
+	playerCtrl.Streamer.Seek(currentPosition + seekStep*sampleRate.N(time.Second))
+	speaker.Unlock()
 }
 
-func seekBackward() {
+func seekBwd() {
 	if playerCtrl.Streamer == nil {
 		return
 	}
+	// lock the speaker. important because we're using the current position.
+	// if unlocked, it changes
+	speaker.Lock()
+	// getting the streamer info
+	currentPosition := playerCtrl.Streamer.Position()
+	totalLen := playerCtrl.Streamer.Len()
+	currentTimeInt := currentPosition / sampleRate.N(time.Second)
+	totalTimeInt := totalLen / sampleRate.N(time.Second)
 
-	currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-
-	if currentTimeInt-5 <= 0 {
-		playerCtrl.Streamer.Seek(0)
-	} else {
-		playerCtrl.Streamer.Seek(playerCtrl.Streamer.Position() - 5*sampleRate.N(time.Second))
+	// if seeking get's us before the start of streamer, skip it
+	if currentTimeInt-seekStep >= totalTimeInt {
+		// don't forget to unlock streamer, otherwise it stops and
+		// we can't unlock it!
+		speaker.Unlock()
+		return
 	}
+
+	// set the streamer's new position and unlock it
+	playerCtrl.Streamer.Seek(currentPosition - seekStep*sampleRate.N(time.Second))
+	speaker.Unlock()
 }
 
 func playThread() {
