@@ -66,8 +66,12 @@ func initGUI() {
 	coverArtImage = canvas.NewImageFromImage(nil)
 	coverArtImage.FillMode = canvas.ImageFillOriginal
 	artistNameTextBox = widget.NewLabelWithData(artistNameText)
+	artistNameTextBox.Alignment = fyne.TextAlignCenter
 	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
+	trackTitleTextBox.Alignment = fyne.TextAlignCenter
+	trackTitleTextBox.TextStyle = fyne.TextStyle{Bold: true}
 	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
+	trackTimeTextBox.Alignment = fyne.TextAlignCenter
 	coverArtImage.Image = blankImage
 
 	nowPlayingWindow := container.NewCenter(container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox))
