@@ -19,7 +19,7 @@ In relative order of implementation:
 - [x] move list to left and have song info on the right, buttons on the bottom
 - [x] add volume control
 - [ ] add volume display
-- [ ] settings panel
+- [x] settings panel
 - [ ] show download progress/downloaded indicator
 - [ ] change playlist panel size/just track info screen
 - [ ] refresh playlist (and delete old tracks`)
