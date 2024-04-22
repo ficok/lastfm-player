@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/gopxl/beep"
@@ -53,4 +54,18 @@ func (cv *CtrlVolume) Err() error {
 		return nil
 	}
 	return cv.Streamer.Err()
+}
+
+func (cv *CtrlVolume) raiseVolume() {
+	fmt.Println("INFO[ctrlVolume]: volume is", cv.Volume)
+	if cv.Volume+volumeStep <= 2.0 {
+		cv.Volume += volumeStep
+	}
+}
+
+func (cv *CtrlVolume) lowerVolume() {
+	fmt.Println("INFO[ctrlVolume]: volume is", cv.Volume)
+	if cv.Volume-volumeStep >= -2.9 {
+		cv.Volume -= volumeStep
+	}
 }

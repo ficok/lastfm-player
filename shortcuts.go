@@ -13,10 +13,9 @@ var mod fyne.KeyModifier
 // shortcut declarations
 var quitSC fyne.Shortcut
 var togglePlaySC fyne.Shortcut
-var seekFwdSC fyne.Shortcut
-var seekBwdSC fyne.Shortcut
-var nextSC fyne.Shortcut
-var prevSC fyne.Shortcut
+var seekFwdSC, seekBwdSC fyne.Shortcut
+var nextSC, prevSC fyne.Shortcut
+var raiseVolSC, lowerVolSC fyne.Shortcut
 
 func initializeAndSetShortcuts() {
 	mod = fyne.KeyModifierControl
@@ -27,6 +26,8 @@ func initializeAndSetShortcuts() {
 	seekBwdSC = &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: mod}
 	nextSC = &desktop.CustomShortcut{KeyName: fyne.KeyL, Modifier: mod}
 	prevSC = &desktop.CustomShortcut{KeyName: fyne.KeyK, Modifier: mod}
+	raiseVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyEqual, Modifier: mod}
+	lowerVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyMinus, Modifier: mod}
 
 	// setting
 	mainWindow.Canvas().AddShortcut(quitSC, handleInput)
@@ -35,6 +36,8 @@ func initializeAndSetShortcuts() {
 	mainWindow.Canvas().AddShortcut(seekBwdSC, handleInput)
 	mainWindow.Canvas().AddShortcut(nextSC, handleInput)
 	mainWindow.Canvas().AddShortcut(prevSC, handleInput)
+	mainWindow.Canvas().AddShortcut(raiseVolSC, handleInput)
+	mainWindow.Canvas().AddShortcut(lowerVolSC, handleInput)
 }
 
 // shortcut handler
@@ -56,7 +59,11 @@ func handleInput(sc fyne.Shortcut) {
 		previousTrack()
 	case "L":
 		nextTrack()
+	case "-":
+		playerCtrl.lowerVolume()
+	case "=":
+		playerCtrl.raiseVolume()
 	default:
-		fmt.Println("INFO[handleInput]: not a shortcut!")
+		fmt.Println("INFO[handleInput]:", key, "is not a shortcut!")
 	}
 }
