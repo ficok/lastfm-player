@@ -96,7 +96,7 @@ func initGUI() {
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 
-	settingsBtns := container.NewGridWithColumns(5, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn)
+	settingsBtns := container.NewGridWithColumns(3, quitBtn, logoutBtn, refreshBtn)
 
 	// volume slider
 	volumeSlider = widget.NewSlider(MIN_VOLUME, MAX_VOLUME)
