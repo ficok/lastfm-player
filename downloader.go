@@ -8,6 +8,9 @@ import (
 	"os/exec"
 )
 
+// number of tracks to download ahead
+var nrOfTracks int = 3
+
 func downloadThread() {
 	/*
 		NOTE: download is only triggered when the playThread sends something to download.
@@ -65,7 +68,7 @@ func downloadThread() {
 		}
 		fmt.Println("INFO[downloadThread]: sent", sent, "tracks to download queue.")
 		// 5. concurrently download in advance
-		go downloadTracksAhead(3)
+		go downloadTracksAhead(nrOfTracks)
 	}
 }
 

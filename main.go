@@ -86,6 +86,7 @@ func main() {
 		loginWindow.Show()
 	} else {
 		playlist = readPlaylist()
+		playChannel <- 1
 		mainWindow.Show()
 	}
 

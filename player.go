@@ -165,6 +165,21 @@ func seekBwd() {
 }
 
 func playThread() {
+	// waiting for the playlist to become ready
+	fmt.Println("INFO[playThread]: waiting for playlist to become ready...")
+	<-playChannel
+	fmt.Println("INFO[playThread]: making the first track ready...")
+	trackLocation := getTrackLocation(playlist[0].ID)
+	if _, statErr := os.Stat(trackLocation); statErr != nil {
+		request := Pair{idx: 0, priority: true}
+		pushFront(request)
+		dldChannel <- true
+		status := <-playChannel
+		if status == 0 {
+			fmt.Println("WARNING[playThread]: couldn't download the first track in advance.")
+		}
+	}
+
 	for {
 		fmt.Println("INFO[playThread]: waiting for play request")
 		// while waiting, timeThread can keep on working

@@ -49,6 +49,7 @@ func initGUI() {
 				downloadPlaylist()
 			}
 			playlist = readPlaylist()
+			playChannel <- 1
 			loginWindow.Close()
 			mainWindow.Show()
 		},
@@ -90,7 +91,7 @@ func initGUI() {
 
 	// SETTINGS PANEL
 	// settings panel buttons
-	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), blank)
+	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), quit)
 	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
 	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
@@ -154,4 +155,8 @@ func playlistUpdateItem(idx int, item fyne.CanvasObject) {
 
 // placeholder function
 func blank() {
+}
+
+func quit() {
+	mainWindow.Close()
 }
