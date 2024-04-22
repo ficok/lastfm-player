@@ -20,7 +20,7 @@ In relative order of implementation:
 - [x] add volume control
 - [x] add volume display (slider)
 - [x] settings panel
-- [ ] upon login/start, immediately download the first track
+- [x] upon login/start, immediately download the first track
 - [ ] show download progress/downloaded indicator
 - [ ] change playlist panel size/just track info screen
 - [ ] refresh playlist (and delete old tracks`)

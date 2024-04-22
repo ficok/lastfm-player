@@ -20,7 +20,7 @@ U pribliznom redosledu implementiranja:
 - [x] kontrole za jacinu zvuka
 - [x] prikaz zvuka (slajder za zvuk)
 - [x] panel sa podesavanjima
-- [ ] pri logovanju/ulasku u program, odmah skini prvu pesmu
+- [x] pri logovanju/ulasku u program, odmah skini prvu pesmu
 - [ ] prikazi progres skidanja i indikator za skinute pesme
 - [ ] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste (uz brisanje starih pesama)
