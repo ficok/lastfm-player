@@ -74,36 +74,49 @@ func initGUI() {
 	trackTimeTextBox.Alignment = fyne.TextAlignCenter
 	coverArtImage.Image = blankImage
 
-	nowPlayingWindow := container.NewCenter(container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox))
-
-	upperPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
-
 	playlistList.OnSelected = playlistSelect
 
 	// setting shortcuts
 	initializeAndSetShortcuts()
 
+	// media control buttons
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
 	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
 	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
-	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
-	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 
-	buttonPnl := container.NewGridWithColumns(7,
+	mediaBtnPnl := container.NewGridWithColumns(5,
 		seekBwdBtn,
 		previousTrackBtn,
 		playPauseBtn,
 		nextTrackBtn,
 		seekFwdBtn,
-		lowerVolBtn,
-		raiseVolBtn,
 	)
 
-	mainPnl := container.NewBorder(nil, buttonPnl, nil, nil, upperPanel)
+	// settings panel buttons
+	quitBtn := widget.NewButtonWithIcon("", theme.CancelIcon(), blank)
+	logoutBtn := widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
+	refreshBtn := widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
+	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
+	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 
-	mainWindow.SetContent(mainPnl)
+	// top panel, with settings buttons
+	settingsPanel := container.NewGridWithColumns(5, quitBtn, logoutBtn, refreshBtn, lowerVolBtn, raiseVolBtn)
+
+	// volume buttons
+
+	// media panel
+	nowPlayingWindow := container.NewCenter(
+		container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, mediaBtnPnl),
+	)
+	// panel with main objects: playlist, playing window
+	mainPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
+
+	// the general panel that will hold all the content
+	panelContents := container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+
+	mainWindow.SetContent(panelContents)
 }
 
 func playlistLen() int {
@@ -116,4 +129,8 @@ func playlistCreateItem() fyne.CanvasObject {
 
 func playlistUpdateItem(idx int, item fyne.CanvasObject) {
 	item.(*widget.Label).SetText(fmt.Sprintf("%d. %s - %s", idx+1, playlist[idx].Artist, playlist[idx].Title))
+}
+
+// placeholder function
+func blank() {
 }
