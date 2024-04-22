@@ -19,7 +19,7 @@ U pribliznom redosledu implementiranja:
 - [x] pomeranje liste u levo i postavljanje informacija o pesmi desno, sa dugmicima za kontrolu ispod
 - [x] kontrole za jacinu zvuka
 - [ ] prikaz zvuka
-- [ ] panel sa podesavanjima
+- [x] panel sa podesavanjima
 - [ ] prikazi progres skidanja i indikator za skinute pesme
 - [ ] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste (uz brisanje starih pesama)
