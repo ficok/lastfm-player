@@ -143,13 +143,27 @@ func seekFwd() {
 	speaker.Unlock()
 }
 
-func seek(value float64) {
+func seek(step int) {
 	if playerCtrl.Streamer == nil {
 		return
 	}
 
 	speaker.Lock()
-	playerCtrl.Streamer.Seek(int(value) * sampleRate.N(time.Second))
+	currentPosition := playerCtrl.Streamer.Position()
+	currentSeconds := currentPosition / sampleRate.N(time.Second)
+
+	totalLength := playerCtrl.Streamer.Len()
+	totalSeconds := totalLength / sampleRate.N(time.Second)
+
+	newSeconds := currentSeconds + step
+	if newSeconds <= 0 || newSeconds >= totalSeconds {
+		speaker.Unlock()
+		return
+	}
+
+	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
+	timeProgressBar.Value = float64(newSeconds)
+	timeProgressBar.Refresh()
 	speaker.Unlock()
 }
 
@@ -162,12 +176,12 @@ func seekBwd() {
 	speaker.Lock()
 	// getting the streamer info
 	currentPosition := playerCtrl.Streamer.Position()
-	totalLen := playerCtrl.Streamer.Len()
+	// totalLen := playerCtrl.Streamer.Len()
 	currentTimeInt := currentPosition / sampleRate.N(time.Second)
-	totalTimeInt := totalLen / sampleRate.N(time.Second)
+	// totalTimeInt := totalLen / sampleRate.N(time.Second)
 
 	// if seeking get's us before the start of streamer, skip it
-	if currentTimeInt-seekStep >= totalTimeInt {
+	if currentTimeInt-seekStep <= 0 {
 		// don't forget to unlock streamer, otherwise it stops and
 		// we can't unlock it!
 		speaker.Unlock()
@@ -259,6 +273,8 @@ func trackTime() {
 		totalTime := getTimeString(totalTimeInt)
 
 		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+
+		playerCtrl.oldPosition = currentTimeInt
 		timeProgressBar.Value = float64(currentTimeInt)
 		timeProgressBar.Refresh()
 

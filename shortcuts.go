@@ -55,17 +55,17 @@ func handleInput(sc fyne.Shortcut) {
 	case "P":
 		togglePlay()
 	case ".":
-		seekFwd()
+		sendRequest(Request{SEEK, seekStep, 0, SC})
 	case ",":
-		seekBwd()
+		sendRequest(Request{SEEK, -seekStep, 0, SC})
 	case "K":
 		previousTrack()
 	case "L":
 		nextTrack()
 	case "-":
-		playerCtrl.lowerVolume()
+		sendRequest(Request{VOL, 0, -volumeStep, SC})
 	case "=":
-		playerCtrl.raiseVolume()
+		sendRequest(Request{VOL, 0, volumeStep, SC})
 	case "Space":
 		togglePlaylistPanel()
 	default:

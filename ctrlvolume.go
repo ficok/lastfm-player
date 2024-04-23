@@ -9,21 +9,22 @@ import (
 )
 
 type CtrlVolume struct {
-	Title    string
-	Artist   string
-	ID       string
-	Streamer beep.StreamSeeker
-	Paused   bool
-	Base     float64
-	Volume   binding.Float
-	Silent   bool
+	Title       string
+	Artist      string
+	ID          string
+	Streamer    beep.StreamSeeker
+	oldPosition int
+	Paused      bool
+	Base        float64
+	Volume      binding.Float
+	Silent      bool
 }
 
 const volumeStep float64 = 0.1
 
 // var baseVolume = 100
 
-const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 2.5
+const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 2.0
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -59,6 +60,20 @@ func (cv *CtrlVolume) Err() error {
 	return cv.Streamer.Err()
 }
 
+func (cv *CtrlVolume) changeVolume(value float64) {
+	fmt.Println("INFO[changeVolume]")
+	oldVolume, _ := cv.Volume.Get()
+	newVolume := roundFloat(oldVolume+value, 1)
+	if newVolume < MIN_VOLUME || newVolume > MAX_VOLUME {
+		return
+	}
+
+	fmt.Println("- old volume:", oldVolume, "\n- volume step:", value, "\n- new volume:", newVolume)
+	cv.Volume.Set(newVolume)
+	volume, _ := cv.Volume.Get()
+	fmt.Println("- cv.Volume is", volume)
+}
+
 func (cv *CtrlVolume) raiseVolume() {
 	/*
 		because the value in the slider and the volume value of the playerCtrl are
@@ -71,10 +86,12 @@ func (cv *CtrlVolume) raiseVolume() {
 	*/
 	dontFireVolumeChange = true
 	fmt.Println("INFO[raiseVolume]")
-	if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
+
+	oldVolume, _ := cv.Volume.Get()
+	volume := roundFloat(oldVolume+volumeStep, 1)
+	if volume > MAX_VOLUME {
 		return
 	} else {
-		volume := oldVolume + volumeStep
 		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
 		cv.Volume.Set(volume)
 		newVolume, _ := cv.Volume.Get()
@@ -95,10 +112,11 @@ func (cv *CtrlVolume) lowerVolume() {
 	dontFireVolumeChange = true
 	fmt.Println("INFO[lowerVolume]")
 
-	if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
+	oldVolume, _ := cv.Volume.Get()
+	volume := roundFloat(oldVolume-volumeStep, 1)
+	if volume < MIN_VOLUME {
 		return
 	} else {
-		volume := oldVolume - volumeStep
 		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
 		cv.Volume.Set(volume)
 		newVolume, _ := cv.Volume.Get()
@@ -110,4 +128,9 @@ func (cv *CtrlVolume) setVolume(volume float64) {
 	cv.Volume.Set(volume)
 	newVolume, _ := cv.Volume.Get()
 	fmt.Println("- cv.Volume is", newVolume)
+}
+
+func roundFloat(val float64, precision uint) float64 {
+	ratio := math.Pow(10, float64(precision))
+	return math.Round(val*ratio) / ratio
 }

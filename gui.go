@@ -6,6 +6,7 @@ import (
 	"image"
 	"log"
 	"os"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -106,8 +107,8 @@ func initGUI() {
 	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), quit)
 	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
 	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
-	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
-	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
+	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), func() { sendRequest(Request{VOL, 0, volumeStep, BTN}) })
+	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), func() { sendRequest(Request{VOL, 0, -volumeStep, BTN}) })
 	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
 	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
@@ -117,13 +118,9 @@ func initGUI() {
 	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.Volume)
 	volumeSlider.Step = volumeStep
 	volumeSlider.OnChangeEnded = func(volume float64) {
-		// if the volume was changed via shortcut or button, do not set volume
-		// from here
-		if !dontFireVolumeChange {
-			playerCtrl.setVolume(volume)
-		}
-		// reset the value for future use
-		dontFireVolumeChange = false
+		oldVolume, _ := playerCtrl.Volume.Get()
+		change := oldVolume - volume
+		sendRequest(Request{VOL, 0, change, SLIDER})
 	}
 
 	settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
@@ -133,8 +130,8 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() { sendRequest(Request{SEEK, seekStep, 0, BTN}) })
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() { sendRequest(Request{SEEK, -seekStep, 0, BTN}) })
 
 	mediaCtrlPnl := container.NewGridWithColumns(5,
 		seekBwdBtn,
@@ -145,11 +142,12 @@ func initGUI() {
 	)
 
 	// progress bar
-	timeProgressBar = widget.NewSlider(0, 1)
+	timeProgressBar = widget.NewSlider(0, 0)
 	timeProgressBar.SetValue(0.0)
 	timeProgressBar.Step = 1.0
-	timeProgressBar.OnChanged = func(time float64) {
-		seek(time)
+	timeProgressBar.OnChangeEnded = func(position float64) {
+		change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
+		sendRequest(Request{SEEK, change, 0, SLIDER})
 	}
 
 	// setting the media panel content

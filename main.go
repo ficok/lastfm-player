@@ -68,8 +68,12 @@ func init() {
 	playChannel = make(chan int, 1)
 	timeChannelGo = make(chan bool, 1)
 	timeChannelStop = make(chan bool, 1)
+	requestChannel = make(chan Request, 1)
+	requestChannelWait = make(chan bool, 1)
+	requestChannelGo = make(chan bool, 1)
 
 	// start play and download threads
+	go synchronizer()
 	go downloadThread()
 	go playThread()
 	go trackTime()
