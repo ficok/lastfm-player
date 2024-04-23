@@ -47,13 +47,15 @@ func init() {
 
 	// init player controller
 	playerCtrl = &CtrlVolume{
-		Streamer: nil,
-		Paused:   true,
-		Silent:   false,
-		Base:     2.0,
-		Volume:   binding.NewFloat(),
+		Streamer:    nil,
+		currentTime: binding.NewFloat(),
+		Paused:      true,
+		Silent:      false,
+		Base:        2.0,
+		Volume:      binding.NewFloat(),
 	}
 	playerCtrl.Volume.Set(1.0)
+	playerCtrl.currentTime.Set(0.0)
 
 	// init download queue
 	downloadQueue = &DoubleList{
@@ -71,6 +73,9 @@ func init() {
 	requestChannel = make(chan Request, 1)
 	requestChannelWait = make(chan bool, 1)
 	requestChannelGo = make(chan bool, 1)
+	priorityChannel = make(chan Request, 1)
+	skipTimeProgressBarUpdate = make(chan bool, 1)
+	continueTrackingTime = make(chan bool, 1)
 
 	// start play and download threads
 	go synchronizer()

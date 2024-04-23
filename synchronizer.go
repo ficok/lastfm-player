@@ -13,7 +13,12 @@ var requestChannel chan Request
 var requestChannelWait chan bool
 var requestChannelGo chan bool
 
+var priorityChannel chan Request
+var skipTimeProgressBarUpdate chan bool
+var continueTrackingTime chan bool
+
 func synchronizer() {
+	go priority()
 	for {
 		// open request channels (must be here for the first request, when the program starts)
 		requestChannelGo <- true
@@ -27,7 +32,7 @@ func synchronizer() {
 
 		switch request.code {
 		case SEEK:
-			seek(request.valueInt)
+			seek(request.valueInt, request.origin)
 		case VOL:
 			/*
 				changing the volume via anything will trigger the OnChanged function in slider widget.
@@ -59,12 +64,21 @@ func synchronizer() {
 			} else if request.origin == SLIDER {
 				playerCtrl.changeVolume(request.valueFloat)
 			}
-		case PBSLIDER:
-			timeProgressBar.Value = request.valueFloat
-			timeProgressBar.Refresh()
 		default:
 		}
 
+	}
+}
+
+// only send request that may come to a race with trackTime
+func priority() {
+	for {
+		// wait for a request
+		request := <-priorityChannel
+		switch request.code {
+		case SEEK:
+			seek(request.valueInt, request.origin)
+		}
 	}
 }
 
@@ -78,11 +92,16 @@ func sendRequest(request Request) {
 	}
 }
 
+func sendPriorityRequest(request Request) {
+	priorityChannel <- request
+}
+
 const (
 	// request code
 	SEEK     uint = 0
 	VOL      uint = 1
 	PBSLIDER uint = 2
+	SKIP     uint = 3
 	// request origin
 	SC          uint = 10
 	BTN         uint = 11
@@ -96,8 +115,6 @@ func codeToString(code uint) string {
 		return "SEEK"
 	case VOL:
 		return "VOL"
-	case PBSLIDER:
-		return "PBSLIDER"
 	default:
 
 	}
@@ -112,8 +129,6 @@ func originToString(origin uint) string {
 		return "BTN"
 	case SLIDER:
 		return "SLIDER"
-	case FNTRACKTIME:
-		return "FNTRACKTIME"
 	default:
 	}
 

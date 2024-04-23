@@ -17,7 +17,6 @@ import (
 )
 
 var playlistPanelOn = true
-var dontFireVolumeChange = false
 
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
@@ -130,8 +129,8 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() { sendRequest(Request{SEEK, seekStep, 0, BTN}) })
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() { sendRequest(Request{SEEK, -seekStep, 0, BTN}) })
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() { sendPriorityRequest(Request{SEEK, seekStep, 0, BTN}) })
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() { sendPriorityRequest(Request{SEEK, -seekStep, 0, BTN}) })
 
 	mediaCtrlPnl := container.NewGridWithColumns(5,
 		seekBwdBtn,
@@ -142,12 +141,11 @@ func initGUI() {
 	)
 
 	// progress bar
-	timeProgressBar = widget.NewSlider(0, 0)
-	timeProgressBar.SetValue(0.0)
+	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
 	timeProgressBar.Step = 1.0
 	timeProgressBar.OnChanged = func(position float64) {
 		change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
-		sendRequest(Request{SEEK, change, 0, SLIDER})
+		sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
 	}
 
 	// setting the media panel content

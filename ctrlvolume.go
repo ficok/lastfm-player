@@ -13,7 +13,7 @@ type CtrlVolume struct {
 	Artist      string
 	ID          string
 	Streamer    beep.StreamSeeker
-	oldPosition int
+	currentTime binding.Float
 	Paused      bool
 	Base        float64
 	Volume      binding.Float
@@ -84,7 +84,6 @@ func (cv *CtrlVolume) raiseVolume() {
 		we don't want that, so we set this variable to true. OnChangeEnded is called,
 		it sees that this value is true and does nothing.
 	*/
-	dontFireVolumeChange = true
 	fmt.Println("INFO[raiseVolume]")
 
 	oldVolume, _ := cv.Volume.Get()
@@ -109,7 +108,6 @@ func (cv *CtrlVolume) lowerVolume() {
 		we don't want that, so we set this variable to true. OnChangeEnded is called,
 		it sees that this value is true and does nothing.
 	*/
-	dontFireVolumeChange = true
 	fmt.Println("INFO[lowerVolume]")
 
 	oldVolume, _ := cv.Volume.Get()

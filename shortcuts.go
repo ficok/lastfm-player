@@ -55,9 +55,9 @@ func handleInput(sc fyne.Shortcut) {
 	case "P":
 		togglePlay()
 	case ".":
-		sendRequest(Request{SEEK, seekStep, 0, SC})
+		sendPriorityRequest(Request{SEEK, seekStep, 0, SC})
 	case ",":
-		sendRequest(Request{SEEK, -seekStep, 0, SC})
+		sendPriorityRequest(Request{SEEK, -seekStep, 0, SC})
 	case "K":
 		previousTrack()
 	case "L":

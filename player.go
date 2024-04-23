@@ -143,7 +143,7 @@ func seekFwd() {
 	speaker.Unlock()
 }
 
-func seek(step int) {
+func seek(step int, origin uint) {
 	if playerCtrl.Streamer == nil {
 		return
 	}
@@ -162,8 +162,9 @@ func seek(step int) {
 	}
 
 	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
-	timeProgressBar.Value = float64(newSeconds)
-	timeProgressBar.Refresh()
+	if origin != SLIDER {
+		playerCtrl.currentTime.Set(float64(currentSeconds))
+	}
 	speaker.Unlock()
 }
 
@@ -274,8 +275,14 @@ func trackTime() {
 
 		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
 
-		playerCtrl.oldPosition = currentTimeInt
-		sendRequest(Request{PBSLIDER, 0, float64(currentTimeInt), FNTRACKTIME})
+		select {
+		case <-skipTimeProgressBarUpdate:
+			<-continueTrackingTime
+		default:
+			// timeProgressBar.Value = float64(currentTimeInt)
+			// timeProgressBar.Refresh()
+			playerCtrl.currentTime.Set(float64(currentTimeInt))
+		}
 
 		// playing the next song
 		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {
