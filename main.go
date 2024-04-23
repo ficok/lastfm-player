@@ -53,7 +53,7 @@ func init() {
 		Base:     2.0,
 		Volume:   binding.NewFloat(),
 	}
-	playerCtrl.Volume.Set(0.0)
+	playerCtrl.Volume.Set(1.0)
 
 	// init download queue
 	downloadQueue = &DoubleList{

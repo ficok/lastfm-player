@@ -110,16 +110,19 @@ func initGUI() {
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
-	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn, lowerVolBtn, raiseVolBtn,
-		blankTextBox, blankTextBox)
+	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
+		blankTextBox, blankTextBox, blankTextBox, blankTextBox)
 
 	// volume slider
 	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.Volume)
 	volumeSlider.Step = volumeStep
 	volumeSlider.OnChangeEnded = func(volume float64) {
+		// if the volume was changed via shortcut or button, do not set volume
+		// from here
 		if !dontFireVolumeChange {
 			playerCtrl.setVolume(volume)
 		}
+		// reset the value for future use
 		dontFireVolumeChange = false
 	}
 

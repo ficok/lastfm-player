@@ -19,11 +19,11 @@ type CtrlVolume struct {
 	Silent   bool
 }
 
-var volumeStep float64 = 0.2
+const volumeStep float64 = 0.1
 
 // var baseVolume = 100
 
-const MIN_VOLUME, MAX_VOLUME float64 = -2.0, 2.0
+const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 2.5
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -60,17 +60,21 @@ func (cv *CtrlVolume) Err() error {
 }
 
 func (cv *CtrlVolume) raiseVolume() {
+	/*
+		because the value in the slider and the volume value of the playerCtrl are
+		bound, if the value of volume was changed by the shortcut or the button,
+		the widget will register it and will call the OnChangeEnded function.
+		in other words, immediately after this function, OnChangeEnded (and
+		therefore setVolume) is called, thus setting the volume twice.
+		we don't want that, so we set this variable to true. OnChangeEnded is called,
+		it sees that this value is true and does nothing.
+	*/
 	dontFireVolumeChange = true
 	fmt.Println("INFO[raiseVolume]")
-	if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep <= MAX_VOLUME {
-		volume := oldVolume + volumeStep
-		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-		cv.Volume.Set(volume)
-		newVolume, _ := cv.Volume.Get()
-		fmt.Println("- cv.Volume is", newVolume)
-
+	if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
+		return
 	} else {
-		volume := MAX_VOLUME
+		volume := oldVolume + volumeStep
 		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
 		cv.Volume.Set(volume)
 		newVolume, _ := cv.Volume.Get()
@@ -79,16 +83,22 @@ func (cv *CtrlVolume) raiseVolume() {
 }
 
 func (cv *CtrlVolume) lowerVolume() {
+	/*
+		because the value in the slider and the volume value of the playerCtrl are
+		bound, if the value of volume was changed by the shortcut or the button,
+		the widget will register it and will call the OnChangeEnded function.
+		in other words, immediately after this function, OnChangeEnded (and
+		therefore setVolume) is called, thus setting the volume twice.
+		we don't want that, so we set this variable to true. OnChangeEnded is called,
+		it sees that this value is true and does nothing.
+	*/
 	dontFireVolumeChange = true
 	fmt.Println("INFO[lowerVolume]")
-	if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep >= MIN_VOLUME {
-		volume := oldVolume - volumeStep
-		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-		cv.Volume.Set(volume)
-		newVolume, _ := cv.Volume.Get()
-		fmt.Println("- cv.Volume is", newVolume)
+
+	if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
+		return
 	} else {
-		volume := MIN_VOLUME
+		volume := oldVolume - volumeStep
 		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
 		cv.Volume.Set(volume)
 		newVolume, _ := cv.Volume.Get()
