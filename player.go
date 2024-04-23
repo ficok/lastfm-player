@@ -275,8 +275,7 @@ func trackTime() {
 		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
 
 		playerCtrl.oldPosition = currentTimeInt
-		timeProgressBar.Value = float64(currentTimeInt)
-		timeProgressBar.Refresh()
+		sendRequest(Request{PBSLIDER, 0, float64(currentTimeInt), FNTRACKTIME})
 
 		// playing the next song
 		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {

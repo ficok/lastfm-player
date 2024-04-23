@@ -145,7 +145,7 @@ func initGUI() {
 	timeProgressBar = widget.NewSlider(0, 0)
 	timeProgressBar.SetValue(0.0)
 	timeProgressBar.Step = 1.0
-	timeProgressBar.OnChangeEnded = func(position float64) {
+	timeProgressBar.OnChanged = func(position float64) {
 		change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
 		sendRequest(Request{SEEK, change, 0, SLIDER})
 	}

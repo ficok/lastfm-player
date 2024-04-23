@@ -59,6 +59,9 @@ func synchronizer() {
 			} else if request.origin == SLIDER {
 				playerCtrl.changeVolume(request.valueFloat)
 			}
+		case PBSLIDER:
+			timeProgressBar.Value = request.valueFloat
+			timeProgressBar.Refresh()
 		default:
 		}
 
@@ -77,12 +80,14 @@ func sendRequest(request Request) {
 
 const (
 	// request code
-	SEEK uint = 0
-	VOL  uint = 1
+	SEEK     uint = 0
+	VOL      uint = 1
+	PBSLIDER uint = 2
 	// request origin
-	SC     uint = 10
-	BTN    uint = 11
-	SLIDER uint = 12
+	SC          uint = 10
+	BTN         uint = 11
+	SLIDER      uint = 12
+	FNTRACKTIME uint = 13
 )
 
 func codeToString(code uint) string {
@@ -91,7 +96,10 @@ func codeToString(code uint) string {
 		return "SEEK"
 	case VOL:
 		return "VOL"
+	case PBSLIDER:
+		return "PBSLIDER"
 	default:
+
 	}
 	return "NO CODE"
 }
@@ -104,6 +112,8 @@ func originToString(origin uint) string {
 		return "BTN"
 	case SLIDER:
 		return "SLIDER"
+	case FNTRACKTIME:
+		return "FNTRACKTIME"
 	default:
 	}
 
