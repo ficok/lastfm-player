@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/gopxl/beep"
 
 	// "github.com/gopxl/beep/mp3"
@@ -50,8 +51,9 @@ func init() {
 		Paused:   true,
 		Silent:   false,
 		Base:     2.0,
-		Volume:   0.0,
+		Volume:   binding.NewFloat(),
 	}
+	playerCtrl.Volume.Set(0.0)
 
 	// init download queue
 	downloadQueue = &DoubleList{

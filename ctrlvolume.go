@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/gopxl/beep"
 )
 
@@ -14,7 +15,7 @@ type CtrlVolume struct {
 	Streamer beep.StreamSeeker
 	Paused   bool
 	Base     float64
-	Volume   float64
+	Volume   binding.Float
 	Silent   bool
 }
 
@@ -40,7 +41,8 @@ func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	gain := 0.0
 
 	if !cv.Silent {
-		gain = math.Pow(cv.Base, cv.Volume)
+		volume, _ := cv.Volume.Get()
+		gain = math.Pow(cv.Base, volume)
 	}
 
 	for i := range samples[:n] {
@@ -58,35 +60,44 @@ func (cv *CtrlVolume) Err() error {
 }
 
 func (cv *CtrlVolume) raiseVolume() {
-	if cv.Volume+volumeStep <= MAX_VOLUME {
-		cv.Volume += volumeStep
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+	dontFireVolumeChange = true
+	fmt.Println("INFO[raiseVolume]")
+	if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep <= MAX_VOLUME {
+		volume := oldVolume + volumeStep
+		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+		cv.Volume.Set(volume)
+		newVolume, _ := cv.Volume.Get()
+		fmt.Println("- cv.Volume is", newVolume)
+
 	} else {
-		cv.Volume = MAX_VOLUME
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+		volume := MAX_VOLUME
+		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+		cv.Volume.Set(volume)
+		newVolume, _ := cv.Volume.Get()
+		fmt.Println("- cv.Volume is", newVolume)
 	}
 }
 
 func (cv *CtrlVolume) lowerVolume() {
-	if cv.Volume-volumeStep >= MIN_VOLUME {
-		cv.Volume -= volumeStep
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+	dontFireVolumeChange = true
+	fmt.Println("INFO[lowerVolume]")
+	if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep >= MIN_VOLUME {
+		volume := oldVolume - volumeStep
+		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+		cv.Volume.Set(volume)
+		newVolume, _ := cv.Volume.Get()
+		fmt.Println("- cv.Volume is", newVolume)
 	} else {
-		cv.Volume = MIN_VOLUME
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+		volume := MIN_VOLUME
+		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+		cv.Volume.Set(volume)
+		newVolume, _ := cv.Volume.Get()
+		fmt.Println("- cv.Volume is", newVolume)
 	}
 }
 
-func (cv *CtrlVolume) setVolume(value float64) {
-	cv.Volume = value
-	volumeSlider.SetValue(cv.Volume)
-	fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+func (cv *CtrlVolume) setVolume(volume float64) {
+	cv.Volume.Set(volume)
+	newVolume, _ := cv.Volume.Get()
+	fmt.Println("- cv.Volume is", newVolume)
 }

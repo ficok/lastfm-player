@@ -16,6 +16,7 @@ import (
 )
 
 var playlistPanelOn = true
+var dontFireVolumeChange = false
 
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
@@ -109,15 +110,17 @@ func initGUI() {
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
 	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
-	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
-		blankTextBox, blankTextBox, blankTextBox, blankTextBox)
+	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn, lowerVolBtn, raiseVolBtn,
+		blankTextBox, blankTextBox)
 
 	// volume slider
-	volumeSlider = widget.NewSlider(MIN_VOLUME, MAX_VOLUME)
+	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.Volume)
 	volumeSlider.Step = volumeStep
-	volumeSlider.SetValue(playerCtrl.Volume)
-	volumeSlider.OnChanged = func(value float64) {
-		playerCtrl.setVolume(value)
+	volumeSlider.OnChangeEnded = func(volume float64) {
+		if !dontFireVolumeChange {
+			playerCtrl.setVolume(volume)
+		}
+		dontFireVolumeChange = false
 	}
 
 	settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
@@ -139,7 +142,6 @@ func initGUI() {
 	)
 
 	// progress bar
-	// there is an issue: clicking on the slider is broken
 	timeProgressBar = widget.NewSlider(0, 1)
 	timeProgressBar.SetValue(0.0)
 	timeProgressBar.Step = 1.0
