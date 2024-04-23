@@ -9,21 +9,23 @@ import (
 )
 
 type CtrlVolume struct {
-	Title    string
-	Artist   string
-	ID       string
-	Streamer beep.StreamSeeker
-	Paused   bool
-	Base     float64
-	Volume   binding.Float
-	Silent   bool
+	Title         string
+	Artist        string
+	ID            string
+	Streamer      beep.StreamSeeker
+	Paused        bool
+	Base          float64
+	Volume        float64
+	VolumePercent binding.Float
+	Silent        bool
 }
 
 const volumeStep float64 = 0.1
+const baseVolume float64 = 100.0
 
 // var baseVolume = 100
 
-const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 2.5
+const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 150.0
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -41,7 +43,7 @@ func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	gain := 0.0
 
 	if !cv.Silent {
-		volume, _ := cv.Volume.Get()
+		volume := cv.Volume
 		gain = math.Pow(cv.Base, volume)
 	}
 
@@ -59,7 +61,7 @@ func (cv *CtrlVolume) Err() error {
 	return cv.Streamer.Err()
 }
 
-func (cv *CtrlVolume) raiseVolume() {
+func raiseVolume() {
 	/*
 		because the value in the slider and the volume value of the playerCtrl are
 		bound, if the value of volume was changed by the shortcut or the button,
@@ -69,20 +71,39 @@ func (cv *CtrlVolume) raiseVolume() {
 		we don't want that, so we set this variable to true. OnChangeEnded is called,
 		it sees that this value is true and does nothing.
 	*/
-	dontFireVolumeChange = true
-	fmt.Println("INFO[raiseVolume]")
-	if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
+
+	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
+	newVolumePercent := oldVolumePercent + volumeStep*10
+	if newVolumePercent > MAX_VOLUME {
 		return
-	} else {
-		volume := oldVolume + volumeStep
-		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-		cv.Volume.Set(volume)
-		newVolume, _ := cv.Volume.Get()
-		fmt.Println("- cv.Volume is", newVolume)
 	}
+	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
+	playerCtrl.VolumePercent.Set(newVolumePercent)
+
+	// oldVolume, _ := playerCtrl.Volume.Get()
+	// newVolume := oldVolume + volumeStep
+	// newVolumePercent := baseVolume + newVolume*10
+	// newvolumepercent := baseVolume + (oldVolume + volumeStep)*10
+	// if newVolumePercent > MAX_VOLUME {
+	// 	newVolume = (MAX_VOLUME - baseVolume) / 10
+	// }
+
+	// playerCtrl.Volume.Set(newVolume)
+
+	// dontFireVolumeChange = true
+	// fmt.Println("INFO[raiseVolume]")
+	// if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
+	// 	return
+	// } else {
+	// 	volume := oldVolume + volumeStep
+	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+	// 	cv.Volume.Set(volume)
+	// 	newVolume, _ := cv.Volume.Get()
+	// 	fmt.Println("- cv.Volume is", newVolume)
+	// }
 }
 
-func (cv *CtrlVolume) lowerVolume() {
+func lowerVolume() {
 	/*
 		because the value in the slider and the volume value of the playerCtrl are
 		bound, if the value of volume was changed by the shortcut or the button,
@@ -92,22 +113,31 @@ func (cv *CtrlVolume) lowerVolume() {
 		we don't want that, so we set this variable to true. OnChangeEnded is called,
 		it sees that this value is true and does nothing.
 	*/
-	dontFireVolumeChange = true
-	fmt.Println("INFO[lowerVolume]")
 
-	if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
+	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
+	newVolumePercent := oldVolumePercent - volumeStep*10
+	if newVolumePercent < MIN_VOLUME {
 		return
-	} else {
-		volume := oldVolume - volumeStep
-		fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-		cv.Volume.Set(volume)
-		newVolume, _ := cv.Volume.Get()
-		fmt.Println("- cv.Volume is", newVolume)
 	}
+	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
+	playerCtrl.VolumePercent.Set(newVolumePercent)
+
+	// dontFireVolumeChange = true
+	// fmt.Println("INFO[lowerVolume]")
+
+	// if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
+	// 	return
+	// } else {
+	// 	volume := oldVolume - volumeStep
+	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+	// 	cv.Volume.Set(volume)
+	// 	newVolume, _ := cv.Volume.Get()
+	// 	fmt.Println("- cv.Volume is", newVolume)
+	// }
 }
 
 func (cv *CtrlVolume) setVolume(volume float64) {
-	cv.Volume.Set(volume)
-	newVolume, _ := cv.Volume.Get()
-	fmt.Println("- cv.Volume is", newVolume)
+	cv.VolumePercent.Set(volume)
+	playerCtrl.Volume = (volume - baseVolume) / 10
+	fmt.Println("- cv.Volume is", volume)
 }

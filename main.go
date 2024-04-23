@@ -47,13 +47,14 @@ func init() {
 
 	// init player controller
 	playerCtrl = &CtrlVolume{
-		Streamer: nil,
-		Paused:   true,
-		Silent:   false,
-		Base:     2.0,
-		Volume:   binding.NewFloat(),
+		Streamer:      nil,
+		Paused:        true,
+		Silent:        false,
+		Base:          2.0,
+		Volume:        0.0,
+		VolumePercent: binding.NewFloat(),
 	}
-	playerCtrl.Volume.Set(1.0)
+	playerCtrl.VolumePercent.Set(100.0)
 
 	// init download queue
 	downloadQueue = &DoubleList{

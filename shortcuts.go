@@ -63,9 +63,9 @@ func handleInput(sc fyne.Shortcut) {
 	case "L":
 		nextTrack()
 	case "-":
-		playerCtrl.lowerVolume()
+		lowerVolume()
 	case "=":
-		playerCtrl.raiseVolume()
+		raiseVolume()
 	case "Space":
 		togglePlaylistPanel()
 	default:

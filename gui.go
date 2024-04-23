@@ -106,15 +106,15 @@ func initGUI() {
 	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), quit)
 	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
 	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
-	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
-	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
+	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), raiseVolume)
+	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), lowerVolume)
 	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
 	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
 		blankTextBox, blankTextBox, blankTextBox, blankTextBox)
 
 	// volume slider
-	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.Volume)
+	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.VolumePercent)
 	volumeSlider.Step = volumeStep
 	volumeSlider.OnChangeEnded = func(volume float64) {
 		// if the volume was changed via shortcut or button, do not set volume
