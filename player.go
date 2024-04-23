@@ -59,6 +59,9 @@ func playTrack(track Track) {
 	//TODO: cannot use Resample, it can't convert to StreamSeeker that we need for current position in track/total track length
 	playerCtrl.Streamer = streamer
 
+	timeProgressBar.Min = float64(0.0)
+	timeProgressBar.Max = float64(playerCtrl.Streamer.Len() / sampleRate.N(time.Second))
+
 	speaker.Play(playerCtrl)
 	setPauseStatus(false)
 }
@@ -241,7 +244,14 @@ func trackTime() {
 		currentTime := getTimeString(currentTimeInt)
 		totalTime := getTimeString(totalTimeInt)
 
-		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+		// depracated in favor of progress bar
+		// trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+		// set the current value for the progress bar
+		timeProgressBar.SetValue(float64(currentTimeInt))
+		// set the progress bar text
+		timeProgressBar.TextFormatter = func() string {
+			return fmt.Sprintf("%s/%s", currentTime, totalTime)
+		}
 
 		// playing the next song
 		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {

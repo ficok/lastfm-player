@@ -18,7 +18,9 @@ import (
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
 var artistNameText, trackTitleText, trackTimeText binding.String
-var artistNameTextBox, trackTitleTextBox, trackTimeTextBox *widget.Label
+
+// trackTimeTextBox depracated in favor of progress bar
+var artistNameTextBox, trackTitleTextBox, trackTimeTextBox, blankTextBox *widget.Label
 var coverArtImage *canvas.Image
 var blankImage image.Image
 var playlistList *widget.List
@@ -26,6 +28,7 @@ var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
 var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
 var quitBtn, refreshBtn, logoutBtn *widget.Button
 var volumeSlider *widget.Slider
+var timeProgressBar *widget.ProgressBar
 
 func initGUI() {
 	// WINDOW INIT
@@ -84,8 +87,10 @@ func initGUI() {
 	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
 	trackTitleTextBox.Alignment = fyne.TextAlignCenter
 	trackTitleTextBox.TextStyle = fyne.TextStyle{Bold: true}
-	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
-	trackTimeTextBox.Alignment = fyne.TextAlignCenter
+	// depracated in favor of progress bar
+	// trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
+	// trackTimeTextBox.Alignment = fyne.TextAlignCenter
+	blankTextBox = widget.NewLabel(" ")
 	coverArtImage.Image = blankImage
 	// ----------
 
@@ -125,9 +130,20 @@ func initGUI() {
 		seekFwdBtn,
 	)
 
+	// progress bar
+	timeProgressBar = widget.NewProgressBar()
+	// initial value is 0
+	timeProgressBar.Value = 0.0
+	// initialising the progress bar text to nothing
+	// check trackTime for formatting
+	timeProgressBar.TextFormatter = func() string {
+		return ""
+	}
+
 	// setting the media panel content
+	// blank text boxes used to narrow space between components; looks nicer
 	nowPlayingWindow := container.NewCenter(
-		container.NewVBox(coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, mediaCtrlPnl),
+		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
 	// MAIN WINDOW
