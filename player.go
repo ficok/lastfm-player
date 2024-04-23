@@ -138,6 +138,18 @@ func seekFwd() {
 
 	// set the streamer's new position and unlock it
 	playerCtrl.Streamer.Seek(currentPosition + seekStep*sampleRate.N(time.Second))
+	timeProgressBar.Value = float64(currentPosition + seekStep)
+	timeProgressBar.Refresh()
+	speaker.Unlock()
+}
+
+func seek(value float64) {
+	if playerCtrl.Streamer == nil {
+		return
+	}
+
+	speaker.Lock()
+	playerCtrl.Streamer.Seek(int(value) * sampleRate.N(time.Second))
 	speaker.Unlock()
 }
 
@@ -164,6 +176,8 @@ func seekBwd() {
 
 	// set the streamer's new position and unlock it
 	playerCtrl.Streamer.Seek(currentPosition - seekStep*sampleRate.N(time.Second))
+	timeProgressBar.Value = float64(currentPosition - seekStep)
+	timeProgressBar.Refresh()
 	speaker.Unlock()
 }
 
@@ -244,14 +258,9 @@ func trackTime() {
 		currentTime := getTimeString(currentTimeInt)
 		totalTime := getTimeString(totalTimeInt)
 
-		// depracated in favor of progress bar
-		// trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
-		// set the current value for the progress bar
-		timeProgressBar.SetValue(float64(currentTimeInt))
-		// set the progress bar text
-		timeProgressBar.TextFormatter = func() string {
-			return fmt.Sprintf("%s/%s", currentTime, totalTime)
-		}
+		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+		timeProgressBar.Value = float64(currentTimeInt)
+		timeProgressBar.Refresh()
 
 		// playing the next song
 		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {

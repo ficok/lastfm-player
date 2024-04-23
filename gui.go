@@ -19,7 +19,6 @@ var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
 var artistNameText, trackTitleText, trackTimeText binding.String
 
-// trackTimeTextBox depracated in favor of progress bar
 var artistNameTextBox, trackTitleTextBox, trackTimeTextBox, blankTextBox *widget.Label
 var coverArtImage *canvas.Image
 var blankImage image.Image
@@ -28,7 +27,7 @@ var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
 var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
 var quitBtn, refreshBtn, logoutBtn *widget.Button
 var volumeSlider *widget.Slider
-var timeProgressBar *widget.ProgressBar
+var timeProgressBar *widget.Slider
 
 func initGUI() {
 	// WINDOW INIT
@@ -87,9 +86,8 @@ func initGUI() {
 	trackTitleTextBox = widget.NewLabelWithData(trackTitleText)
 	trackTitleTextBox.Alignment = fyne.TextAlignCenter
 	trackTitleTextBox.TextStyle = fyne.TextStyle{Bold: true}
-	// depracated in favor of progress bar
-	// trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
-	// trackTimeTextBox.Alignment = fyne.TextAlignCenter
+	trackTimeTextBox = widget.NewLabelWithData(trackTimeText)
+	trackTimeTextBox.Alignment = fyne.TextAlignCenter
 	blankTextBox = widget.NewLabel(" ")
 	coverArtImage.Image = blankImage
 	// ----------
@@ -131,19 +129,17 @@ func initGUI() {
 	)
 
 	// progress bar
-	timeProgressBar = widget.NewProgressBar()
-	// initial value is 0
-	timeProgressBar.Value = 0.0
-	// initialising the progress bar text to nothing
-	// check trackTime for formatting
-	timeProgressBar.TextFormatter = func() string {
-		return ""
+	timeProgressBar = widget.NewSlider(0, 1)
+	timeProgressBar.SetValue(0.0)
+	timeProgressBar.Step = 1.0
+	timeProgressBar.OnChanged = func(time float64) {
+		seek(time)
 	}
 
 	// setting the media panel content
 	// blank text boxes used to narrow space between components; looks nicer
 	nowPlayingWindow := container.NewCenter(
-		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
+		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
 	// MAIN WINDOW
