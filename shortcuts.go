@@ -16,6 +16,7 @@ var togglePlaySC fyne.Shortcut
 var seekFwdSC, seekBwdSC fyne.Shortcut
 var nextSC, prevSC fyne.Shortcut
 var raiseVolSC, lowerVolSC fyne.Shortcut
+var togglePlaylistPanelSC fyne.Shortcut
 
 func initializeAndSetShortcuts() {
 	mod = fyne.KeyModifierControl
@@ -28,6 +29,7 @@ func initializeAndSetShortcuts() {
 	prevSC = &desktop.CustomShortcut{KeyName: fyne.KeyK, Modifier: mod}
 	raiseVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyEqual, Modifier: mod}
 	lowerVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyMinus, Modifier: mod}
+	togglePlaylistPanelSC = &desktop.CustomShortcut{KeyName: fyne.KeySpace, Modifier: mod}
 
 	// setting
 	mainWindow.Canvas().AddShortcut(quitSC, handleInput)
@@ -38,6 +40,7 @@ func initializeAndSetShortcuts() {
 	mainWindow.Canvas().AddShortcut(prevSC, handleInput)
 	mainWindow.Canvas().AddShortcut(raiseVolSC, handleInput)
 	mainWindow.Canvas().AddShortcut(lowerVolSC, handleInput)
+	mainWindow.Canvas().AddShortcut(togglePlaylistPanelSC, handleInput)
 }
 
 // shortcut handler
@@ -63,6 +66,8 @@ func handleInput(sc fyne.Shortcut) {
 		playerCtrl.lowerVolume()
 	case "=":
 		playerCtrl.raiseVolume()
+	case "Space":
+		togglePlaylistPanel()
 	default:
 		fmt.Println("INFO[handleInput]:", key, "is not a shortcut!")
 	}

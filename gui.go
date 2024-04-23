@@ -15,6 +15,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+var playlistPanelOn = true
+
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
 var artistNameText, trackTitleText, trackTimeText binding.String
@@ -25,9 +27,15 @@ var blankImage image.Image
 var playlistList *widget.List
 var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
 var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
-var quitBtn, refreshBtn, logoutBtn *widget.Button
+var quitBtn, refreshBtn, logoutBtn, togglePlaylistPanelBtn *widget.Button
 var volumeSlider *widget.Slider
 var timeProgressBar *widget.Slider
+
+var mainPanel *fyne.Container
+var nowPlayingWindow *fyne.Container
+var panelContents *fyne.Container
+var settingsBtns *fyne.Container
+var settingsPanel *fyne.Container
 
 func initGUI() {
 	// WINDOW INIT
@@ -99,8 +107,10 @@ func initGUI() {
 	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
 	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), playerCtrl.raiseVolume)
 	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), playerCtrl.lowerVolume)
+	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
-	settingsBtns := container.NewGridWithColumns(3, quitBtn, logoutBtn, refreshBtn)
+	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
+		blankTextBox, blankTextBox, blankTextBox, blankTextBox)
 
 	// volume slider
 	volumeSlider = widget.NewSlider(MIN_VOLUME, MAX_VOLUME)
@@ -110,7 +120,7 @@ func initGUI() {
 		playerCtrl.setVolume(value)
 	}
 
-	settingsPanel := container.NewGridWithColumns(2, settingsBtns, volumeSlider)
+	settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
 
 	// MEDIA PANEL
 	// media control buttons
@@ -129,6 +139,7 @@ func initGUI() {
 	)
 
 	// progress bar
+	// there is an issue: clicking on the slider is broken
 	timeProgressBar = widget.NewSlider(0, 1)
 	timeProgressBar.SetValue(0.0)
 	timeProgressBar.Step = 1.0
@@ -138,16 +149,16 @@ func initGUI() {
 
 	// setting the media panel content
 	// blank text boxes used to narrow space between components; looks nicer
-	nowPlayingWindow := container.NewCenter(
+	nowPlayingWindow = container.NewCenter(
 		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
 	// MAIN WINDOW
 	// panel with main objects: playlist, playing window
-	mainPanel := container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
+	mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
 
 	// the general panel that will hold all the content
-	panelContents := container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+	panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
 
 	// appending everything to the mainWindow
 	mainWindow.SetContent(panelContents)
@@ -171,4 +182,31 @@ func blank() {
 
 func quit() {
 	mainWindow.Close()
+}
+
+func togglePlaylistPanel() {
+	if playlistPanelOn {
+		// now it's false
+		playlistPanelOn = !playlistPanelOn
+
+		// draw gui w/o playlist panel
+		mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
+		settingsBtns = container.NewGridWithColumns(6, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
+			blankTextBox, blankTextBox)
+		settingsPanel = container.NewGridWithColumns(3, settingsBtns, volumeSlider, blankTextBox)
+
+		panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+		mainWindow.SetContent(panelContents)
+	} else {
+		// now it's true
+		playlistPanelOn = !playlistPanelOn
+		// draw gui w/ playlist panel
+		mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
+		settingsBtns = container.NewGridWithColumns(9, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
+			blankTextBox, blankTextBox, blankTextBox, blankTextBox, blankTextBox)
+		settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
+
+		panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+		mainWindow.SetContent(panelContents)
+	}
 }
