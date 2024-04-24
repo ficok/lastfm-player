@@ -283,14 +283,19 @@ func trackTime() {
 
 				**TEMPORARY FIX**
 				this thread is working and setting the current time too fast, either making synchronization
-				between this thread and OnChanged function impossible, or making me stupid.
+				between this thread and OnChanged function impossible, or making me look stupid.
 				time.Sleep(time.Second) resolved the issue. now this thread ticks every 1 second, which is fine,
 				because it only updates time, and it makes sense that it does that every 1 second.
 
 				this enables using a simple if condition in the OnChangeEnded function, which skips sending a seek
 				request, if the slider change came from this thread.
-				seeking by clicking on the slider works fine, seeking by sliding the slider also works fine (sometimes
-				the position dot bugs out a bit, but in the end it lands on the proper position.)
+				seeking by clicking on the slider works fine, seeking by sliding the slider also mostly works fine:
+				- if you drag and hold for too long, the position dot will escape the mouse
+				- sometimes after using the slider to seek, the progress bar first updates back to where the trackTime
+				  sets it, but immediately jumps back to the correct position
+				- rarely just doesn't seek
+
+				it depends on the timing of the seeking and trackTime; sometimes they clash.
 
 				this is a bad, ugly fix, but it works for now.
 			*/
