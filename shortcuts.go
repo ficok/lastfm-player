@@ -55,9 +55,13 @@ func handleInput(sc fyne.Shortcut) {
 	case "P":
 		togglePlay()
 	case ".":
+		// skipTimeProgressBarUpdate <- true
 		sendPriorityRequest(Request{SEEK, seekStep, 0, SC})
+		// continueTrackingTime <- true
 	case ",":
+		// skipTimeProgressBarUpdate <- true
 		sendPriorityRequest(Request{SEEK, -seekStep, 0, SC})
+		// continueTrackingTime <- true
 	case "K":
 		previousTrack()
 	case "L":

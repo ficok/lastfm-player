@@ -150,13 +150,14 @@ func seek(step int, origin uint) {
 
 	skipTimeProgressBarUpdate <- true
 	speaker.Lock()
-	currentPosition := playerCtrl.Streamer.Position()
-	currentSeconds := currentPosition / sampleRate.N(time.Second)
+	// currentPosition := playerCtrl.Streamer.Position()
+	// currentSeconds := currentPosition / sampleRate.N(time.Second)
+	currentSeconds, _ := playerCtrl.currentTime.Get()
 
 	totalLength := playerCtrl.Streamer.Len()
 	totalSeconds := totalLength / sampleRate.N(time.Second)
 
-	newSeconds := currentSeconds + step
+	newSeconds := int(currentSeconds) + step
 	if newSeconds <= 0 || newSeconds >= totalSeconds {
 		speaker.Unlock()
 		return
@@ -164,7 +165,7 @@ func seek(step int, origin uint) {
 
 	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
 	if origin != SLIDER {
-		playerCtrl.currentTime.Set(float64(currentSeconds))
+		playerCtrl.currentTime.Set(float64(newSeconds))
 	}
 	speaker.Unlock()
 	continueTrackingTime <- true

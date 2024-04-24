@@ -6,7 +6,6 @@ import (
 	"image"
 	"log"
 	"os"
-	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -132,8 +131,16 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() { sendPriorityRequest(Request{SEEK, seekStep, 0, BTN}) })
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() { sendPriorityRequest(Request{SEEK, -seekStep, 0, BTN}) })
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() {
+		// skipTimeProgressBarUpdate <- true
+		sendPriorityRequest(Request{SEEK, seekStep, 0, BTN})
+		// continueTrackingTime <- true
+	})
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() {
+		// skipTimeProgressBarUpdate <- true
+		sendPriorityRequest(Request{SEEK, -seekStep, 0, BTN})
+		// continueTrackingTime <- true
+	})
 
 	mediaCtrlPnl := container.NewGridWithColumns(5,
 		seekBwdBtn,
@@ -145,11 +152,15 @@ func initGUI() {
 
 	// progress bar
 	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
-	timeProgressBar.Step = 1.0
+	timeProgressBar.Step = 0.1
 	timeProgressBar.OnChangeEnded = func(position float64) {
 		if !dontChange {
-			change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
+			// skipTimeProgressBarUpdate <- true
+			currentTime, _ := playerCtrl.currentTime.Get()
+			// change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
+			change := int(position - currentTime)
 			sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
+			// continueTrackingTime <- true
 		}
 
 		dontChange = false
