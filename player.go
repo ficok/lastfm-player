@@ -256,31 +256,55 @@ func playThread() {
 
 func trackTime() {
 	for {
+		if playerCtrl.Streamer == nil {
+			continue
+		}
+
 		select {
 		case <-timeChannelStop:
 			<-timeChannelGo
 		default:
 		}
 
-		// printing currently playing time info
-		if playerCtrl.Streamer == nil {
-			continue
-		}
-
-		currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-		totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
-
-		currentTime := getTimeString(currentTimeInt)
-		totalTime := getTimeString(totalTimeInt)
-
-		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
-
 		select {
 		case <-skipTimeProgressBarUpdate:
 			<-continueTrackingTime
 		default:
-			// timeProgressBar.Value = float64(currentTimeInt)
-			// timeProgressBar.Refresh()
+			/*
+				this is still creating a problem.
+				it sets the binding value, which triggers the OnChanged or OnChangeEnded
+				function. is seeks to it's new position. this creates a short but obvious
+				sound of seeking, similar to speeding up the play speed for a big factor.
+
+				if we're using a binding, that means that whenever this function updates the value,
+				both OnChanged and OnChangeEnded will be called and we must somehow skip this.
+
+				not using a binding breaks seeking via slider.
+
+				**TEMPORARY FIX**
+				this thread is working and setting the current time too fast, either making synchronization
+				between this thread and OnChanged function impossible, or making me stupid.
+				time.Sleep(time.Second) resolved the issue. now this thread ticks every 1 second, which is fine,
+				because it only updates time, and it makes sense that it does that every 1 second.
+
+				this enables using a simple if condition in the OnChangeEnded function, which skips sending a seek
+				request, if the slider change came from this thread.
+				seeking by clicking on the slider works fine, seeking by sliding the slider also works fine (sometimes
+				the position dot bugs out a bit, but in the end it lands on the proper position.)
+
+				this is a bad, ugly fix, but it works for now.
+			*/
+
+			time.Sleep(time.Second)
+
+			currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+			totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+
+			currentTime := getTimeString(currentTimeInt)
+			totalTime := getTimeString(totalTimeInt)
+
+			trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+			dontChange = true
 			playerCtrl.currentTime.Set(float64(currentTimeInt))
 		}
 

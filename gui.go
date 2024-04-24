@@ -17,6 +17,7 @@ import (
 )
 
 var playlistPanelOn = true
+var dontChange = false
 
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
@@ -143,9 +144,15 @@ func initGUI() {
 	// progress bar
 	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
 	timeProgressBar.Step = 1.0
-	timeProgressBar.OnChanged = func(position float64) {
-		change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
-		sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
+	timeProgressBar.OnChangeEnded = func(position float64) {
+		if !dontChange {
+			skipTimeProgressBarUpdate <- true
+			change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
+			sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
+			continueTrackingTime <- true
+		}
+
+		dontChange = false
 	}
 
 	// setting the media panel content
