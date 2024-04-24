@@ -16,7 +16,7 @@ import (
 )
 
 var playlistPanelOn = true
-var dontFireVolumeChange = false
+var skipSliderVolumeUpdate = false
 
 var mainApp fyne.App
 var mainWindow, loginWindow fyne.Window
@@ -106,8 +106,14 @@ func initGUI() {
 	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), quit)
 	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
 	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
-	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), raiseVolume)
-	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), lowerVolume)
+	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), func() {
+		skipSliderVolumeUpdate = true
+		playerCtrl.setVolume(volumeStep)
+	})
+	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), func() {
+		skipSliderVolumeUpdate = true
+		playerCtrl.setVolume(-volumeStep)
+	})
 	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
 
 	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
@@ -119,11 +125,13 @@ func initGUI() {
 	volumeSlider.OnChanged = func(volume float64) {
 		// if the volume was changed via shortcut or button, do not set volume
 		// from here
-		if !dontFireVolumeChange {
-			playerCtrl.setVolume(volume)
+		if !skipSliderVolumeUpdate {
+			oldVolume, _ := playerCtrl.VolumePercent.Get()
+			volumeChange := volume - oldVolume
+			playerCtrl.setVolume(volumeChange)
 		}
 		// reset the value for future use
-		dontFireVolumeChange = false
+		skipSliderVolumeUpdate = false
 	}
 
 	settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)

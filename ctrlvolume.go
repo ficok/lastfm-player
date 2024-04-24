@@ -20,7 +20,7 @@ type CtrlVolume struct {
 	Silent        bool
 }
 
-const volumeStep float64 = 0.1
+const volumeStep float64 = 1.0
 const baseVolume float64 = 100.0
 
 // var baseVolume = 100
@@ -61,83 +61,16 @@ func (cv *CtrlVolume) Err() error {
 	return cv.Streamer.Err()
 }
 
-func raiseVolume() {
-	/*
-		because the value in the slider and the volume value of the playerCtrl are
-		bound, if the value of volume was changed by the shortcut or the button,
-		the widget will register it and will call the OnChangeEnded function.
-		in other words, immediately after this function, OnChangeEnded (and
-		therefore setVolume) is called, thus setting the volume twice.
-		we don't want that, so we set this variable to true. OnChangeEnded is called,
-		it sees that this value is true and does nothing.
-	*/
+func (cv *CtrlVolume) setVolume(volumeChange float64) {
+	fmt.Println("INFO[setVolume]")
+	oldVolume, _ := cv.VolumePercent.Get()
 
-	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
-	newVolumePercent := oldVolumePercent + volumeStep*10
-	if newVolumePercent > MAX_VOLUME {
+	newVolume := oldVolume + volumeChange
+	if newVolume < MIN_VOLUME || newVolume > MAX_VOLUME {
 		return
 	}
-	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
-	playerCtrl.VolumePercent.Set(newVolumePercent)
 
-	// oldVolume, _ := playerCtrl.Volume.Get()
-	// newVolume := oldVolume + volumeStep
-	// newVolumePercent := baseVolume + newVolume*10
-	// newvolumepercent := baseVolume + (oldVolume + volumeStep)*10
-	// if newVolumePercent > MAX_VOLUME {
-	// 	newVolume = (MAX_VOLUME - baseVolume) / 10
-	// }
-
-	// playerCtrl.Volume.Set(newVolume)
-
-	// dontFireVolumeChange = true
-	// fmt.Println("INFO[raiseVolume]")
-	// if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
-	// 	return
-	// } else {
-	// 	volume := oldVolume + volumeStep
-	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-	// 	cv.Volume.Set(volume)
-	// 	newVolume, _ := cv.Volume.Get()
-	// 	fmt.Println("- cv.Volume is", newVolume)
-	// }
-}
-
-func lowerVolume() {
-	/*
-		because the value in the slider and the volume value of the playerCtrl are
-		bound, if the value of volume was changed by the shortcut or the button,
-		the widget will register it and will call the OnChangeEnded function.
-		in other words, immediately after this function, OnChangeEnded (and
-		therefore setVolume) is called, thus setting the volume twice.
-		we don't want that, so we set this variable to true. OnChangeEnded is called,
-		it sees that this value is true and does nothing.
-	*/
-
-	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
-	newVolumePercent := oldVolumePercent - volumeStep*10
-	if newVolumePercent < MIN_VOLUME {
-		return
-	}
-	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
-	playerCtrl.VolumePercent.Set(newVolumePercent)
-
-	// dontFireVolumeChange = true
-	// fmt.Println("INFO[lowerVolume]")
-
-	// if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
-	// 	return
-	// } else {
-	// 	volume := oldVolume - volumeStep
-	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
-	// 	cv.Volume.Set(volume)
-	// 	newVolume, _ := cv.Volume.Get()
-	// 	fmt.Println("- cv.Volume is", newVolume)
-	// }
-}
-
-func (cv *CtrlVolume) setVolume(volume float64) {
-	cv.VolumePercent.Set(volume)
-	playerCtrl.Volume = (volume - baseVolume) / 10
-	fmt.Println("- cv.Volume is", volume)
+	cv.VolumePercent.Set(newVolume)
+	playerCtrl.Volume = (newVolume - baseVolume) / 10
+	fmt.Println("- cv.Volume is", newVolume)
 }
