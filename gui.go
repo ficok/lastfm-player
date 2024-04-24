@@ -132,14 +132,14 @@ func initGUI() {
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
 	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() {
-		// skipTimeProgressBarUpdate <- true
-		sendPriorityRequest(Request{SEEK, seekStep, 0, BTN})
-		// continueTrackingTime <- true
+		// this is the sendPriorityRequest function; i thought that the performance
+		// would benefir from eliminating a function call
+		priorityChannel <- Request{SEEK, seekStep, 0, BTN}
 	})
 	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() {
-		// skipTimeProgressBarUpdate <- true
-		sendPriorityRequest(Request{SEEK, -seekStep, 0, BTN})
-		// continueTrackingTime <- true
+		// this is the sendPriorityRequest function; i thought that the performance
+		// would benefir from eliminating a function call
+		priorityChannel <- Request{SEEK, -seekStep, 0, BTN}
 	})
 
 	mediaCtrlPnl := container.NewGridWithColumns(5,
@@ -152,15 +152,14 @@ func initGUI() {
 
 	// progress bar
 	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
-	timeProgressBar.Step = 0.1
+	timeProgressBar.Step = 0.01
 	timeProgressBar.OnChangeEnded = func(position float64) {
 		if !dontChange {
-			// skipTimeProgressBarUpdate <- true
 			currentTime, _ := playerCtrl.currentTime.Get()
-			// change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
 			change := int(position - currentTime)
-			sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
-			// continueTrackingTime <- true
+			// this is the sendPriorityRequest function; i thought that the performance
+			// would benefir from eliminating a function call
+			priorityChannel <- Request{SEEK, change, 0, SLIDER}
 		}
 
 		dontChange = false

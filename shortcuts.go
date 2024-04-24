@@ -55,13 +55,13 @@ func handleInput(sc fyne.Shortcut) {
 	case "P":
 		togglePlay()
 	case ".":
-		// skipTimeProgressBarUpdate <- true
-		sendPriorityRequest(Request{SEEK, seekStep, 0, SC})
-		// continueTrackingTime <- true
+		// this is the sendPriorityRequest function; i thought that the performance
+		// would benefir from eliminating a function call
+		priorityChannel <- Request{SEEK, seekStep, 0, SC}
 	case ",":
-		// skipTimeProgressBarUpdate <- true
-		sendPriorityRequest(Request{SEEK, -seekStep, 0, SC})
-		// continueTrackingTime <- true
+		// this is the sendPriorityRequest function; i thought that the performance
+		// would benefir from eliminating a function call
+		priorityChannel <- Request{SEEK, -seekStep, 0, SC}
 	case "K":
 		previousTrack()
 	case "L":

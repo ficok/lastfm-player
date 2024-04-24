@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+
+	"github.com/gopxl/beep/speaker"
+)
 
 type Request struct {
 	code       uint
@@ -77,7 +82,37 @@ func priority() {
 		request := <-priorityChannel
 		switch request.code {
 		case SEEK:
-			seek(request.valueInt, request.origin)
+			// seek(request.valueInt, request.origin)
+			// below is the seek function; i thought maybe the performance would benefit from
+			// eliminating the function call
+			if playerCtrl.Streamer == nil {
+				return
+			}
+
+			fmt.Println("INFO[seek(priority thread)]: informing trackTime to skip update")
+			skipTimeProgressBarUpdate <- true
+			speaker.Lock()
+			// currentPosition := playerCtrl.Streamer.Position()
+			// currentSeconds := currentPosition / sampleRate.N(time.Second)
+			currentSeconds, _ := playerCtrl.currentTime.Get()
+
+			// totalLength := playerCtrl.Streamer.Len()
+			// totalSeconds := totalLength / sampleRate.N(time.Second)
+			totalSeconds := playerCtrl.totalTime
+
+			newSeconds := int(currentSeconds) + request.valueInt
+			if newSeconds <= 0 || newSeconds >= totalSeconds {
+				speaker.Unlock()
+				return
+			}
+
+			playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
+			if request.origin != SLIDER {
+				playerCtrl.currentTime.Set(float64(newSeconds))
+			}
+			speaker.Unlock()
+			fmt.Println("INFO[seek(priority thread)]: informing trackTime to continue")
+			continueTrackingTime <- true
 		}
 	}
 }

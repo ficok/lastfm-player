@@ -149,6 +149,7 @@ func seek(step int, origin uint) {
 		return
 	}
 
+	fmt.Println("INFO[seek]: informing trackTime to skip update")
 	skipTimeProgressBarUpdate <- true
 	speaker.Lock()
 	// currentPosition := playerCtrl.Streamer.Position()
@@ -170,6 +171,7 @@ func seek(step int, origin uint) {
 		playerCtrl.currentTime.Set(float64(newSeconds))
 	}
 	speaker.Unlock()
+	fmt.Println("INFO[seek]: informing trackTime to continue")
 	continueTrackingTime <- true
 }
 
@@ -273,7 +275,9 @@ func trackTime() {
 
 		select {
 		case <-skipTimeProgressBarUpdate:
+			fmt.Println("INFO[trackTime]: waiting for permission to update time")
 			<-continueTrackingTime
+			fmt.Println("INFO[trackTime]: permission received")
 		default:
 			/*
 				this is still creating a problem.
@@ -305,7 +309,6 @@ func trackTime() {
 
 				this is a bad, ugly fix, but it works for now.
 			*/
-
 			time.Sleep(time.Second)
 
 			currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
@@ -315,6 +318,7 @@ func trackTime() {
 			totalTime := getTimeString(totalTimeInt)
 
 			trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
+			fmt.Println("INFO[trackTime]: updating time")
 			dontChange = true
 			playerCtrl.currentTime.Set(float64(currentTimeInt))
 		}
