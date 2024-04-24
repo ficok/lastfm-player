@@ -38,6 +38,8 @@ var dldChannel chan bool
 var timeChannelGo chan bool
 var timeChannelStop chan bool
 var playingNextTrackChannel chan bool
+var skipTimeUpdate chan bool
+var continueTimeUpdate chan bool
 
 func init() {
 	// init speaker
@@ -49,6 +51,7 @@ func init() {
 	// init player controller
 	playerCtrl = &CtrlVolume{
 		Streamer:      nil,
+		currentTime:   binding.NewFloat(),
 		Paused:        true,
 		Silent:        false,
 		Base:          2.0,
@@ -56,6 +59,7 @@ func init() {
 		VolumePercent: binding.NewFloat(),
 	}
 	playerCtrl.VolumePercent.Set(100.0)
+	playerCtrl.currentTime.Set(0.0)
 
 	// init download queue
 	downloadQueue = &DoubleList{
@@ -71,6 +75,8 @@ func init() {
 	timeChannelGo = make(chan bool, 1)
 	timeChannelStop = make(chan bool, 1)
 	playingNextTrackChannel = make(chan bool, 1)
+	skipTimeUpdate = make(chan bool, 1)
+	continueTimeUpdate = make(chan bool, 1)
 
 	// start play and download threads
 	go downloadThread()

@@ -141,8 +141,12 @@ func initGUI() {
 	previousTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipPreviousIcon(), previousTrack)
 	playPauseBtn = widget.NewButtonWithIcon("", theme.MediaPlayIcon(), togglePlay)
 	nextTrackBtn = widget.NewButtonWithIcon("", theme.MediaSkipNextIcon(), nextTrack)
-	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), seekFwd)
-	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), seekBwd)
+	seekFwdBtn = widget.NewButtonWithIcon("", theme.MediaFastForwardIcon(), func() {
+		seek(seekStep)
+	})
+	seekBwdBtn = widget.NewButtonWithIcon("", theme.MediaFastRewindIcon(), func() {
+		seek(-seekStep)
+	})
 
 	mediaCtrlPnl := container.NewGridWithColumns(5,
 		seekBwdBtn,
@@ -153,11 +157,13 @@ func initGUI() {
 	)
 
 	// progress bar
-	timeProgressBar = widget.NewSlider(0, 1)
-	timeProgressBar.SetValue(0.0)
-	timeProgressBar.Step = 1.0
+	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
+	timeProgressBar.Step = 0.0
 	timeProgressBar.OnChanged = func(time float64) {
-		seek(time)
+		fmt.Println("INFO[time progress bar]: disabled")
+	}
+	timeProgressBar.OnChangeEnded = func(time float64) {
+		fmt.Println("INFO[time progress bar]: disabled")
 	}
 
 	// setting the media panel content

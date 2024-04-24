@@ -59,8 +59,8 @@ func playTrack(track Track) {
 	//TODO: cannot use Resample, it can't convert to StreamSeeker that we need for current position in track/total track length
 	playerCtrl.Streamer = streamer
 
-	timeProgressBar.Min = float64(0.0)
-	timeProgressBar.Max = float64(playerCtrl.Streamer.Len() / sampleRate.N(time.Second))
+	playerCtrl.totalTime = playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+	timeProgressBar.Max = float64(playerCtrl.totalTime)
 
 	speaker.Play(playerCtrl)
 	setPauseStatus(false)
@@ -143,13 +143,33 @@ func seekFwd() {
 	speaker.Unlock()
 }
 
-func seek(value float64) {
+/*
+	ISSUE:
+	seeking backward repeatedly when the new position would be less than 0
+	for some reasong sets the progressbar value to max briefly (streaming not
+	affected, just looks weird)
+	TODO:
+	remove old seeking functions, unify the interface
+*/
+
+func seek(change int) {
 	if playerCtrl.Streamer == nil {
 		return
 	}
 
 	speaker.Lock()
-	playerCtrl.Streamer.Seek(int(value) * sampleRate.N(time.Second))
+
+	currentSeconds, _ := playerCtrl.currentTime.Get()
+	totalSeconds := playerCtrl.totalTime
+
+	newSeconds := int(currentSeconds) + change
+
+	if newSeconds <= 0 || newSeconds >= totalSeconds {
+		return
+	}
+
+	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
+
 	speaker.Unlock()
 }
 
@@ -252,15 +272,17 @@ func trackTime() {
 			continue
 		}
 
-		currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-		totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+		// currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		// totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
 
-		currentTime := getTimeString(currentTimeInt)
-		totalTime := getTimeString(totalTimeInt)
+		// currentTime := getTimeString(currentTimeInt)
+		// totalTime := getTimeString(totalTimeInt)
 
-		trackTimeText.Set(fmt.Sprintf("%s/%s", currentTime, totalTime))
-		timeProgressBar.Value = float64(currentTimeInt)
-		timeProgressBar.Refresh()
+		currentTime := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		playerCtrl.currentTime.Set(float64(currentTime))
+		totalTime := playerCtrl.totalTime
+
+		trackTimeText.Set(fmt.Sprintf("%s/%s", getTimeString(currentTime), getTimeString(totalTime)))
 
 		// ensure we never skip a track
 		select {
