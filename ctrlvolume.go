@@ -4,25 +4,28 @@ import (
 	"fmt"
 	"math"
 
+	"fyne.io/fyne/v2/data/binding"
 	"github.com/gopxl/beep"
 )
 
 type CtrlVolume struct {
-	Title    string
-	Artist   string
-	ID       string
-	Streamer beep.StreamSeeker
-	Paused   bool
-	Base     float64
-	Volume   float64
-	Silent   bool
+	Title         string
+	Artist        string
+	ID            string
+	Streamer      beep.StreamSeeker
+	Paused        bool
+	Base          float64
+	Volume        float64
+	VolumePercent binding.Float
+	Silent        bool
 }
 
-var volumeStep float64 = 0.2
+const volumeStep float64 = 0.1
+const baseVolume float64 = 100.0
 
 // var baseVolume = 100
 
-const MIN_VOLUME, MAX_VOLUME float64 = -2.0, 2.0
+const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 150.0
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -40,7 +43,8 @@ func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	gain := 0.0
 
 	if !cv.Silent {
-		gain = math.Pow(cv.Base, cv.Volume)
+		volume := cv.Volume
+		gain = math.Pow(cv.Base, volume)
 	}
 
 	for i := range samples[:n] {
@@ -57,36 +61,83 @@ func (cv *CtrlVolume) Err() error {
 	return cv.Streamer.Err()
 }
 
-func (cv *CtrlVolume) raiseVolume() {
-	if cv.Volume+volumeStep <= MAX_VOLUME {
-		cv.Volume += volumeStep
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
-	} else {
-		cv.Volume = MAX_VOLUME
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+func raiseVolume() {
+	/*
+		because the value in the slider and the volume value of the playerCtrl are
+		bound, if the value of volume was changed by the shortcut or the button,
+		the widget will register it and will call the OnChangeEnded function.
+		in other words, immediately after this function, OnChangeEnded (and
+		therefore setVolume) is called, thus setting the volume twice.
+		we don't want that, so we set this variable to true. OnChangeEnded is called,
+		it sees that this value is true and does nothing.
+	*/
+
+	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
+	newVolumePercent := oldVolumePercent + volumeStep*10
+	if newVolumePercent > MAX_VOLUME {
+		return
 	}
+	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
+	playerCtrl.VolumePercent.Set(newVolumePercent)
+
+	// oldVolume, _ := playerCtrl.Volume.Get()
+	// newVolume := oldVolume + volumeStep
+	// newVolumePercent := baseVolume + newVolume*10
+	// newvolumepercent := baseVolume + (oldVolume + volumeStep)*10
+	// if newVolumePercent > MAX_VOLUME {
+	// 	newVolume = (MAX_VOLUME - baseVolume) / 10
+	// }
+
+	// playerCtrl.Volume.Set(newVolume)
+
+	// dontFireVolumeChange = true
+	// fmt.Println("INFO[raiseVolume]")
+	// if oldVolume, _ := cv.Volume.Get(); oldVolume+volumeStep > MAX_VOLUME {
+	// 	return
+	// } else {
+	// 	volume := oldVolume + volumeStep
+	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+	// 	cv.Volume.Set(volume)
+	// 	newVolume, _ := cv.Volume.Get()
+	// 	fmt.Println("- cv.Volume is", newVolume)
+	// }
 }
 
-func (cv *CtrlVolume) lowerVolume() {
-	if cv.Volume-volumeStep >= MIN_VOLUME {
-		cv.Volume -= volumeStep
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
-	} else {
-		cv.Volume = MIN_VOLUME
-		volumeSlider.Value = cv.Volume
-		fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
-		volumeSlider.Refresh()
+func lowerVolume() {
+	/*
+		because the value in the slider and the volume value of the playerCtrl are
+		bound, if the value of volume was changed by the shortcut or the button,
+		the widget will register it and will call the OnChangeEnded function.
+		in other words, immediately after this function, OnChangeEnded (and
+		therefore setVolume) is called, thus setting the volume twice.
+		we don't want that, so we set this variable to true. OnChangeEnded is called,
+		it sees that this value is true and does nothing.
+	*/
+
+	oldVolumePercent, _ := playerCtrl.VolumePercent.Get()
+	newVolumePercent := oldVolumePercent - volumeStep*10
+	if newVolumePercent < MIN_VOLUME {
+		return
 	}
+	playerCtrl.Volume = (newVolumePercent - baseVolume) / 10
+	playerCtrl.VolumePercent.Set(newVolumePercent)
+
+	// dontFireVolumeChange = true
+	// fmt.Println("INFO[lowerVolume]")
+
+	// if oldVolume, _ := cv.Volume.Get(); oldVolume-volumeStep < MIN_VOLUME {
+	// 	return
+	// } else {
+	// 	volume := oldVolume - volumeStep
+	// 	fmt.Println("- old volume:", oldVolume, "\n- volume step:", volumeStep, "\n- new volume:", volume)
+	// 	cv.Volume.Set(volume)
+	// 	newVolume, _ := cv.Volume.Get()
+	// 	fmt.Println("- cv.Volume is", newVolume)
+	// }
 }
 
-func (cv *CtrlVolume) setVolume(value float64) {
-	cv.Volume = value
-	volumeSlider.SetValue(cv.Volume)
-	fmt.Println("INFO[ctrlVolume]:\n- cv.Volume is", cv.Volume, "\n- volumeSlider.Value is:", volumeSlider.Value)
+func (cv *CtrlVolume) setVolume(volume float64) {
+	cv.VolumePercent.Set(volume)
+	playerCtrl.Volume = (volume - baseVolume) / 10
+	fmt.Println("- cv.Volume is", volume)
 }
