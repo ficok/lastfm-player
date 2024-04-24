@@ -116,7 +116,7 @@ func initGUI() {
 	// volume slider
 	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.VolumePercent)
 	volumeSlider.Step = volumeStep
-	volumeSlider.OnChangeEnded = func(volume float64) {
+	volumeSlider.OnChanged = func(volume float64) {
 		// if the volume was changed via shortcut or button, do not set volume
 		// from here
 		if !dontFireVolumeChange {
