@@ -60,7 +60,8 @@ func playTrack(track Track) {
 	playerCtrl.Streamer = streamer
 
 	timeProgressBar.Min = float64(0.0)
-	timeProgressBar.Max = float64(playerCtrl.Streamer.Len() / sampleRate.N(time.Second))
+	playerCtrl.totalTime = playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+	timeProgressBar.Max = float64(playerCtrl.totalTime)
 
 	speaker.Play(playerCtrl)
 	setPauseStatus(false)
@@ -154,8 +155,9 @@ func seek(step int, origin uint) {
 	// currentSeconds := currentPosition / sampleRate.N(time.Second)
 	currentSeconds, _ := playerCtrl.currentTime.Get()
 
-	totalLength := playerCtrl.Streamer.Len()
-	totalSeconds := totalLength / sampleRate.N(time.Second)
+	// totalLength := playerCtrl.Streamer.Len()
+	// totalSeconds := totalLength / sampleRate.N(time.Second)
+	totalSeconds := playerCtrl.totalTime
 
 	newSeconds := int(currentSeconds) + step
 	if newSeconds <= 0 || newSeconds >= totalSeconds {
@@ -307,7 +309,7 @@ func trackTime() {
 			time.Sleep(time.Second)
 
 			currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-			totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
+			totalTimeInt := playerCtrl.totalTime
 
 			currentTime := getTimeString(currentTimeInt)
 			totalTime := getTimeString(totalTimeInt)
