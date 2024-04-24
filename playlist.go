@@ -47,6 +47,8 @@ func downloadPlaylist() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	playlistReady <- true
 }
 
 // read playlist JSON and return a slice of tracks

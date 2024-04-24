@@ -60,6 +60,8 @@ func initGUI() {
 			if _, err := os.Stat(playlistFile); err != nil {
 				downloadPlaylist()
 			}
+			// make sure the playlist file is ready
+			<-playlistReady
 			playlist = readPlaylist()
 			playChannel <- 1
 			loginWindow.Close()
@@ -146,10 +148,8 @@ func initGUI() {
 	timeProgressBar.Step = 1.0
 	timeProgressBar.OnChangeEnded = func(position float64) {
 		if !dontChange {
-			skipTimeProgressBarUpdate <- true
 			change := int(position) - (playerCtrl.Streamer.Position() / sampleRate.N(time.Second))
 			sendPriorityRequest(Request{SEEK, change, 0, SLIDER})
-			continueTrackingTime <- true
 		}
 
 		dontChange = false

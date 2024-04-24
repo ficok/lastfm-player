@@ -37,6 +37,7 @@ var playChannel chan int
 var dldChannel chan bool
 var timeChannelGo chan bool
 var timeChannelStop chan bool
+var playlistReady chan bool
 
 func init() {
 	// init speaker
@@ -76,6 +77,7 @@ func init() {
 	priorityChannel = make(chan Request, 1)
 	skipTimeProgressBarUpdate = make(chan bool, 1)
 	continueTrackingTime = make(chan bool, 1)
+	playlistReady = make(chan bool, 1)
 
 	// start play and download threads
 	go synchronizer()
@@ -84,7 +86,6 @@ func init() {
 	go trackTime()
 
 	playlist = []Track{}
-
 }
 
 func main() {

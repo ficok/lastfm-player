@@ -148,6 +148,7 @@ func seek(step int, origin uint) {
 		return
 	}
 
+	skipTimeProgressBarUpdate <- true
 	speaker.Lock()
 	currentPosition := playerCtrl.Streamer.Position()
 	currentSeconds := currentPosition / sampleRate.N(time.Second)
@@ -166,6 +167,7 @@ func seek(step int, origin uint) {
 		playerCtrl.currentTime.Set(float64(currentSeconds))
 	}
 	speaker.Unlock()
+	continueTrackingTime <- true
 }
 
 func seekBwd() {
@@ -294,6 +296,7 @@ func trackTime() {
 				- sometimes after using the slider to seek, the progress bar first updates back to where the trackTime
 				  sets it, but immediately jumps back to the correct position
 				- rarely just doesn't seek
+				- seeking via buttons or shortcuts often breaks
 
 				it depends on the timing of the seeking and trackTime; sometimes they clash.
 
