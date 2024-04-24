@@ -262,9 +262,19 @@ func trackTime() {
 		timeProgressBar.Value = float64(currentTimeInt)
 		timeProgressBar.Refresh()
 
-		// playing the next song
-		if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {
-			playlistList.Select(playlistIndex + 1)
+		// ensure we never skip a track
+		select {
+		case <-playingNextTrackChannel:
+		// if something is received, that means that in the previous iteration, a new
+		// track request was sent, so we should skip the check altogether
+		default:
+			// playing the next song
+			if playerCtrl.Streamer.Position() == playerCtrl.Streamer.Len() {
+				// inform the channel that we're already playing the next song
+				playingNextTrackChannel <- true
+				// change this to nextTrack? shouldn't break anything
+				playlistList.Select(playlistIndex + 1)
+			}
 		}
 	}
 }

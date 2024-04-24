@@ -36,6 +36,7 @@ var playChannel chan int
 var dldChannel chan bool
 var timeChannelGo chan bool
 var timeChannelStop chan bool
+var playingNextTrackChannel chan bool
 
 func init() {
 	// init speaker
@@ -66,6 +67,7 @@ func init() {
 	playChannel = make(chan int, 1)
 	timeChannelGo = make(chan bool, 1)
 	timeChannelStop = make(chan bool, 1)
+	playingNextTrackChannel = make(chan bool, 1)
 
 	// start play and download threads
 	go downloadThread()
