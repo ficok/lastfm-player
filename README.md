@@ -3,6 +3,18 @@
 A university project for the Programming paradigms course at the Faculty of Mathematics, University of Belgrade.<br>
 A GUI music player written in Go that uses the [last.fm](https://www.last.fm/) API to download a user's `mix.json` file, parses it and downloads and plays the tracks. <br> **A work in progress**.
 
+## Shortcuts
+- modifier key: **control**
+- **q**: quit
+- **space**: toggle play/pause
+- **;**: previous song
+- **'**: next song
+- **-**: lower volume
+- **=**: raise volume
+- **,**: seek back 5 seconds
+- **.**: seek forward 5 seconds
+- **p**: show/hide playlist
+
 ## To-do
 In relative order of implementation:
 - [x] download thread

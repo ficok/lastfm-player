@@ -4,6 +4,19 @@ Projekat za predmet Programske paradigme na Matematickom fakultetu Univerziteta 
 GUI muzicki plejer napisan u programskom jeziku Go koji koristi [last.fm](https://www.last.fm/) API da skine korisnikov `mix.json`, parsira ga i skida i pusta pesme. <br>
 **Jos uvek u izradi**.
 
+## Precice
+- mod taster: **control**
+- **q**: ugasi program
+- **space**: pusti/pauziraj
+- **;**: prethodna pesma
+- **'**: naredna pesma
+- **-**: smanji zvuk
+- **=**: pojacaj zvuk
+- **,**: skoci 5 sekundi unazad
+- **.**: skoci 5 sekundi unapred
+- **p**: sakrij/prikazi listu pesama
+
+
 ## Preostali posao
 U pribliznom redosledu implementiranja:
 - [x] download thread
