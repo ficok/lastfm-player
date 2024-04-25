@@ -15,7 +15,7 @@ var quitSC fyne.Shortcut
 var togglePlaySC fyne.Shortcut
 var seekFwdSC, seekBwdSC fyne.Shortcut
 var nextSC, prevSC fyne.Shortcut
-var raiseVolSC, lowerVolSC fyne.Shortcut
+var raiseVolSC, lowerVolSC, muteSC fyne.Shortcut
 var togglePlaylistPanelSC fyne.Shortcut
 
 func initializeAndSetShortcuts() {
@@ -29,6 +29,7 @@ func initializeAndSetShortcuts() {
 	prevSC = &desktop.CustomShortcut{KeyName: fyne.KeyApostrophe, Modifier: mod}
 	raiseVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyEqual, Modifier: mod}
 	lowerVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyMinus, Modifier: mod}
+	muteSC = &desktop.CustomShortcut{KeyName: fyne.KeyM, Modifier: mod}
 	togglePlaylistPanelSC = &desktop.CustomShortcut{KeyName: fyne.KeyP, Modifier: mod}
 
 	// setting
@@ -40,6 +41,7 @@ func initializeAndSetShortcuts() {
 	mainWindow.Canvas().AddShortcut(prevSC, handleInput)
 	mainWindow.Canvas().AddShortcut(raiseVolSC, handleInput)
 	mainWindow.Canvas().AddShortcut(lowerVolSC, handleInput)
+	mainWindow.Canvas().AddShortcut(muteSC, handleInput)
 	mainWindow.Canvas().AddShortcut(togglePlaylistPanelSC, handleInput)
 }
 
@@ -68,6 +70,9 @@ func handleInput(sc fyne.Shortcut) {
 	case "=":
 		skipSliderVolumeUpdate = true
 		playerCtrl.setVolume(volumeStep)
+	case "M":
+		skipSliderVolumeUpdate = true
+		playerCtrl.mute()
 	case "P":
 		togglePlaylistPanel()
 	default:

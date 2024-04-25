@@ -19,15 +19,16 @@ type CtrlVolume struct {
 	Base          float64
 	Volume        float64
 	VolumePercent binding.Float
+	beforeMute    float64
 	Silent        bool
 }
 
 const volumeStep float64 = 1.0
-const baseVolume float64 = 100.0
+const baseVolume float64 = 80.0
 
 // var baseVolume = 100
 
-const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 150.0
+const MIN_VOLUME, MAX_VOLUME float64 = 0.0, 100.0
 
 func (cv *CtrlVolume) Stream(samples [][2]float64) (n int, ok bool) {
 	if cv.Streamer == nil {
@@ -75,4 +76,15 @@ func (cv *CtrlVolume) setVolume(volumeChange float64) {
 	cv.VolumePercent.Set(newVolume)
 	playerCtrl.Volume = (newVolume - baseVolume) / 10
 	fmt.Println("- cv.Volume is", newVolume)
+}
+
+func (cv *CtrlVolume) mute() {
+	if cv.Silent {
+		cv.VolumePercent.Set(cv.beforeMute)
+		cv.Silent = !cv.Silent
+	} else {
+		cv.beforeMute, _ = cv.VolumePercent.Get()
+		cv.VolumePercent.Set(0)
+		cv.Silent = !cv.Silent
+	}
 }
