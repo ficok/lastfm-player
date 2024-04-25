@@ -22,7 +22,7 @@ In relative order of implementation:
 - [x] settings panel
 - [x] upon login/start, immediately download the first track
 - [ ] show download progress/downloaded indicator
-- [ ] change playlist panel size/just track info screen
+- [x] change playlist panel size/just track info screen
 - [ ] refresh playlist (and delete old tracks`)
 - [ ] download new mix in advance, append to the current
 <br>
@@ -30,7 +30,4 @@ In relative order of implementation:
 *Maybe*
 
 - [ ] keyboard control overhaul (use without mod key)
-- [ ] visualizer
-- [ ] delete tracks automatically
-- [ ] play opus/webm file directly (if possible)
 - [ ] scrobble to LastFM

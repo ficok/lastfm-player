@@ -22,7 +22,7 @@ U pribliznom redosledu implementiranja:
 - [x] panel sa podesavanjima
 - [x] pri logovanju/ulasku u program, odmah skini prvu pesmu
 - [ ] prikazi progres skidanja i indikator za skinute pesme
-- [ ] opcija za skrivanje i prikazivanje plejliste
+- [x] opcija za skrivanje i prikazivanje plejliste
 - [ ] osvezavanje plejliste (uz brisanje starih pesama)
 - [ ] skidanje novog miksa unapred i nalepljivanje na kraj trenutnog
 <br>
@@ -30,7 +30,4 @@ U pribliznom redosledu implementiranja:
 *Mozda*
 
 - [ ] prerada kontrole na tastaturi (za koriscenje bez mod tastera)
-- [ ] vizuelizacija
-- [ ] automatsko brisanje pesama
-- [ ] direktno pustanje opus/webm fajlova (ukoliko je moguce)
 - [ ] skroblovanje na last.fm
