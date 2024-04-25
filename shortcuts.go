@@ -22,14 +22,14 @@ func initializeAndSetShortcuts() {
 	mod = fyne.KeyModifierControl
 	// initializing
 	quitSC = &desktop.CustomShortcut{KeyName: fyne.KeyQ, Modifier: mod}
-	togglePlaySC = &desktop.CustomShortcut{KeyName: fyne.KeyP, Modifier: mod}
+	togglePlaySC = &desktop.CustomShortcut{KeyName: fyne.KeySpace, Modifier: mod}
 	seekFwdSC = &desktop.CustomShortcut{KeyName: fyne.KeyPeriod, Modifier: mod}
 	seekBwdSC = &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: mod}
-	nextSC = &desktop.CustomShortcut{KeyName: fyne.KeyL, Modifier: mod}
-	prevSC = &desktop.CustomShortcut{KeyName: fyne.KeyK, Modifier: mod}
+	nextSC = &desktop.CustomShortcut{KeyName: fyne.KeySemicolon, Modifier: mod}
+	prevSC = &desktop.CustomShortcut{KeyName: fyne.KeyApostrophe, Modifier: mod}
 	raiseVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyEqual, Modifier: mod}
 	lowerVolSC = &desktop.CustomShortcut{KeyName: fyne.KeyMinus, Modifier: mod}
-	togglePlaylistPanelSC = &desktop.CustomShortcut{KeyName: fyne.KeySpace, Modifier: mod}
+	togglePlaylistPanelSC = &desktop.CustomShortcut{KeyName: fyne.KeyP, Modifier: mod}
 
 	// setting
 	mainWindow.Canvas().AddShortcut(quitSC, handleInput)
@@ -52,15 +52,15 @@ func handleInput(sc fyne.Shortcut) {
 	switch key {
 	case "Q":
 		mainWindow.Close()
-	case "P":
+	case "Space":
 		togglePlay()
 	case ".":
 		seek(seekStep)
 	case ",":
 		seek(-seekStep)
-	case "K":
+	case ";":
 		previousTrack()
-	case "L":
+	case "'":
 		nextTrack()
 	case "-":
 		skipSliderVolumeUpdate = true
@@ -68,7 +68,7 @@ func handleInput(sc fyne.Shortcut) {
 	case "=":
 		skipSliderVolumeUpdate = true
 		playerCtrl.setVolume(volumeStep)
-	case "Space":
+	case "P":
 		togglePlaylistPanel()
 	default:
 		fmt.Println("INFO[handleInput]:", key, "is not a shortcut!")
