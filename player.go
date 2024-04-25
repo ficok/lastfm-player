@@ -116,13 +116,6 @@ func previousTrack() {
 }
 
 /*
-ISSUE:
-seeking backward repeatedly when the new position would be less than 0
-for some reasong sets the progressbar value to max briefly (streaming not
-affected, just looks weird)
-TODO:
-remove old seeking functions, unify the interface
-
 TRY: not using a current time binding, but refreshing the time progress bar position
 with timeProgressBar.Value and timeProgressBar.Refresh() (this way, the progress bar
 is unclickable)
@@ -134,7 +127,7 @@ func seek(change int) {
 
 	speaker.Lock()
 
-	currentSeconds, _ := playerCtrl.currentTime.Get()
+	currentSeconds := playerCtrl.currentTime
 	totalSeconds := playerCtrl.totalTime
 
 	newSeconds := int(currentSeconds) + change
@@ -226,11 +219,12 @@ func trackTime() {
 		// currentTime := getTimeString(currentTimeInt)
 		// totalTime := getTimeString(totalTimeInt)
 
-		currentTime := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-		playerCtrl.currentTime.Set(float64(currentTime))
-		totalTime := playerCtrl.totalTime
+		playerCtrl.currentTime = playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		timeProgressBar.Value = float64(playerCtrl.currentTime)
+		timeProgressBar.Refresh()
+		// playerCtrl.currentTime.Set(float64(currentTime))
 
-		trackTimeText.Set(fmt.Sprintf("%s/%s", getTimeString(currentTime), getTimeString(totalTime)))
+		trackTimeText.Set(fmt.Sprintf("%s/%s", getTimeString(playerCtrl.currentTime), getTimeString(playerCtrl.totalTime)))
 
 		// ensure we never skip a track
 		select {

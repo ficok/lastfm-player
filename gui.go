@@ -157,8 +157,9 @@ func initGUI() {
 	)
 
 	// progress bar
-	timeProgressBar = widget.NewSliderWithData(0, 0, playerCtrl.currentTime)
+	timeProgressBar = widget.NewSlider(0, 0)
 	timeProgressBar.Step = 0.0
+	timeProgressBar.Value = 0.0
 	timeProgressBar.OnChanged = func(time float64) {
 		fmt.Println("INFO[time progress bar]: disabled")
 	}

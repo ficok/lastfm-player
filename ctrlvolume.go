@@ -13,7 +13,7 @@ type CtrlVolume struct {
 	Artist        string
 	ID            string
 	Streamer      beep.StreamSeeker
-	currentTime   binding.Float
+	currentTime   int
 	totalTime     int
 	Paused        bool
 	Base          float64
