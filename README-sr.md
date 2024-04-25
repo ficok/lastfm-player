@@ -6,15 +6,16 @@ GUI muzicki plejer napisan u programskom jeziku Go koji koristi [last.fm](https:
 
 ## Precice
 - mod taster: **control**
-- **q**: ugasi program
-- **space**: pusti/pauziraj
-- **;**: prethodna pesma
-- **'**: naredna pesma
-- **-**: smanji zvuk
-- **=**: pojacaj zvuk
-- **,**: skoci 5 sekundi unazad
-- **.**: skoci 5 sekundi unapred
-- **p**: sakrij/prikazi listu pesama
+- **q** ugasi program
+- **space** pusti/pauziraj
+- **;** prethodna pesma
+- **'** naredna pesma
+- **-** smanji zvuk
+- **=** pojacaj zvuk
+- **m** mutiraj
+- **,** skoci 5 sekundi unazad
+- **.** skoci 5 sekundi unapred
+- **p** sakrij/prikazi listu pesama
 
 
 ## Preostali posao

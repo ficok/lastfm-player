@@ -5,15 +5,16 @@ A GUI music player written in Go that uses the [last.fm](https://www.last.fm/) A
 
 ## Shortcuts
 - modifier key: **control**
-- **q**: quit
-- **space**: toggle play/pause
-- **;**: previous song
-- **'**: next song
-- **-**: lower volume
-- **=**: raise volume
-- **,**: seek back 5 seconds
-- **.**: seek forward 5 seconds
-- **p**: show/hide playlist
+- **q** quit
+- **space** toggle play/pause
+- **;** previous song
+- **'** next song
+- **-** lower volume
+- **=** raise volume
+- **m** mute
+- **,** seek back 5 seconds
+- **.** seek forward 5 seconds
+- **p** show/hide playlist
 
 ## To-do
 In relative order of implementation:
