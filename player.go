@@ -115,11 +115,6 @@ func previousTrack() {
 	playlistList.Select(playlistIndex - 1)
 }
 
-/*
-TRY: not using a current time binding, but refreshing the time progress bar position
-with timeProgressBar.Value and timeProgressBar.Refresh() (this way, the progress bar
-is unclickable)
-*/
 func seek(change int) {
 	if playerCtrl.Streamer == nil {
 		return
@@ -132,12 +127,13 @@ func seek(change int) {
 
 	newSeconds := int(currentSeconds) + change
 
-	if newSeconds <= 0 || newSeconds >= totalSeconds {
-		speaker.Unlock()
-		return
+	if newSeconds <= 0 {
+		playerCtrl.Streamer.Seek(0 * sampleRate.N(time.Second))
+	} else if newSeconds >= totalSeconds {
+		playerCtrl.Streamer.Seek((totalSeconds - 1) * sampleRate.N(time.Second))
+	} else {
+		playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
 	}
-
-	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
 
 	speaker.Unlock()
 }
