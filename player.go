@@ -140,6 +140,7 @@ func seek(change int) {
 	newSeconds := int(currentSeconds) + change
 
 	if newSeconds <= 0 || newSeconds >= totalSeconds {
+		speaker.Unlock()
 		return
 	}
 
