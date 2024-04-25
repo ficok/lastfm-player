@@ -115,43 +115,18 @@ func previousTrack() {
 	playlistList.Select(playlistIndex - 1)
 }
 
-func seekFwd() {
-	if playerCtrl.Streamer == nil {
-		return
-	}
-	// lock the speaker. important because we're using the current position.
-	// if unlocked, it changes
-	speaker.Lock()
-	// getting the streamer info
-	currentPosition := playerCtrl.Streamer.Position()
-	totalLen := playerCtrl.Streamer.Len()
-	currentTimeInt := currentPosition / sampleRate.N(time.Second)
-	totalTimeInt := totalLen / sampleRate.N(time.Second)
-
-	// if seeking get's us past the end of streamer, skip it
-	if currentTimeInt+seekStep >= totalTimeInt {
-		// don't forget to unlock streamer, otherwise it stops and
-		// we can't unlock it!
-		speaker.Unlock()
-		return
-	}
-
-	// set the streamer's new position and unlock it
-	playerCtrl.Streamer.Seek(currentPosition + seekStep*sampleRate.N(time.Second))
-	timeProgressBar.Value = float64(currentPosition + seekStep)
-	timeProgressBar.Refresh()
-	speaker.Unlock()
-}
-
 /*
-	ISSUE:
-	seeking backward repeatedly when the new position would be less than 0
-	for some reasong sets the progressbar value to max briefly (streaming not
-	affected, just looks weird)
-	TODO:
-	remove old seeking functions, unify the interface
-*/
+ISSUE:
+seeking backward repeatedly when the new position would be less than 0
+for some reasong sets the progressbar value to max briefly (streaming not
+affected, just looks weird)
+TODO:
+remove old seeking functions, unify the interface
 
+TRY: not using a current time binding, but refreshing the time progress bar position
+with timeProgressBar.Value and timeProgressBar.Refresh() (this way, the progress bar
+is unclickable)
+*/
 func seek(change int) {
 	if playerCtrl.Streamer == nil {
 		return
@@ -170,34 +145,6 @@ func seek(change int) {
 
 	playerCtrl.Streamer.Seek(newSeconds * sampleRate.N(time.Second))
 
-	speaker.Unlock()
-}
-
-func seekBwd() {
-	if playerCtrl.Streamer == nil {
-		return
-	}
-	// lock the speaker. important because we're using the current position.
-	// if unlocked, it changes
-	speaker.Lock()
-	// getting the streamer info
-	currentPosition := playerCtrl.Streamer.Position()
-	totalLen := playerCtrl.Streamer.Len()
-	currentTimeInt := currentPosition / sampleRate.N(time.Second)
-	totalTimeInt := totalLen / sampleRate.N(time.Second)
-
-	// if seeking get's us before the start of streamer, skip it
-	if currentTimeInt-seekStep >= totalTimeInt {
-		// don't forget to unlock streamer, otherwise it stops and
-		// we can't unlock it!
-		speaker.Unlock()
-		return
-	}
-
-	// set the streamer's new position and unlock it
-	playerCtrl.Streamer.Seek(currentPosition - seekStep*sampleRate.N(time.Second))
-	timeProgressBar.Value = float64(currentPosition - seekStep)
-	timeProgressBar.Refresh()
 	speaker.Unlock()
 }
 
