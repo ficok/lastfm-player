@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"fyne.io/fyne/v2/theme"
 	"github.com/gopxl/beep/mp3"
 	"github.com/gopxl/beep/speaker"
 )
@@ -75,11 +74,6 @@ func setPauseStatus(paused bool) {
 
 	speaker.Lock()
 	playerCtrl.Paused = paused
-	if paused {
-		playPauseBtn.SetIcon(theme.MediaPlayIcon())
-	} else {
-		playPauseBtn.SetIcon(theme.MediaPauseIcon())
-	}
 	speaker.Unlock()
 	fmt.Println("INFO[Player]: paused:", playerCtrl.Paused)
 }
