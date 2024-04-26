@@ -16,7 +16,6 @@ import (
 )
 
 var playlistPanelOn = true
-var toolbarExtended = false
 var skipSliderVolumeUpdate = false
 
 var mainApp fyne.App
@@ -28,16 +27,13 @@ var coverArtImage *canvas.Image
 var blankImage image.Image
 var playlistList *widget.List
 var previousTrackBtn, playPauseBtn, nextTrackBtn *widget.Button
-var seekFwdBtn, seekBwdBtn, lowerVolBtn, raiseVolBtn *widget.Button
-var quitBtn, refreshBtn, logoutBtn, togglePlaylistPanelBtn *widget.Button
+var seekFwdBtn, seekBwdBtn *widget.Button
 var volumeSlider *widget.Slider
 var timeProgressBar *widget.Slider
 
 var mainPanel *fyne.Container
 var nowPlayingWindow *fyne.Container
 var panelContents *fyne.Container
-var settingsBtns *fyne.Container
-var settingsPanel *fyne.Container
 var mainToolbar, normalToolbar, extendedToolbar *widget.Toolbar
 
 func initGUI() {
@@ -103,24 +99,6 @@ func initGUI() {
 	coverArtImage.Image = blankImage
 	// ----------
 
-	// SETTINGS PANEL
-	// settings panel buttons
-	quitBtn = widget.NewButtonWithIcon("", theme.CancelIcon(), quit)
-	logoutBtn = widget.NewButtonWithIcon("", theme.LogoutIcon(), blank)
-	refreshBtn = widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), blank)
-	raiseVolBtn = widget.NewButtonWithIcon("", theme.VolumeUpIcon(), func() {
-		skipSliderVolumeUpdate = true
-		playerCtrl.setVolume(volumeStep)
-	})
-	lowerVolBtn = widget.NewButtonWithIcon("", theme.VolumeDownIcon(), func() {
-		skipSliderVolumeUpdate = true
-		playerCtrl.setVolume(-volumeStep)
-	})
-	togglePlaylistPanelBtn = widget.NewButtonWithIcon("", theme.ColorPaletteIcon(), togglePlaylistPanel)
-
-	settingsBtns = container.NewGridWithColumns(8, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
-		blankTextBox, blankTextBox, blankTextBox, blankTextBox)
-
 	// volume slider
 	volumeSlider = widget.NewSliderWithData(MIN_VOLUME, MAX_VOLUME, playerCtrl.VolumePercent)
 	volumeSlider.Step = volumeStep
@@ -136,7 +114,22 @@ func initGUI() {
 		skipSliderVolumeUpdate = false
 	}
 
-	settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
+	// volume control
+	volumeCtrl := widget.NewToolbar(
+		widget.NewToolbarAction(theme.VolumeDownIcon(), func() {
+			skipSliderVolumeUpdate = true
+			playerCtrl.setVolume(-volumeStep)
+		}),
+		widget.NewToolbarAction(theme.VolumeUpIcon(), func() {
+			skipSliderVolumeUpdate = true
+			playerCtrl.setVolume(volumeStep)
+		}),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(theme.VolumeMuteIcon(), func() {
+			skipSliderVolumeUpdate = true
+			playerCtrl.mute()
+		}),
+	)
 
 	// MEDIA PANEL
 	// media control buttons
@@ -172,7 +165,8 @@ func initGUI() {
 	// setting the media panel content
 	// blank text boxes used to narrow space between components; looks nicer
 	nowPlayingWindow = container.NewCenter(
-		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
+		container.NewVBox(volumeCtrl, volumeSlider, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
+			trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
 	// toolbar
@@ -239,9 +233,6 @@ func togglePlaylistPanel() {
 
 		// draw gui w/o playlist panel
 		mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
-		settingsBtns = container.NewGridWithColumns(6, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
-			blankTextBox, blankTextBox)
-		settingsPanel = container.NewGridWithColumns(3, settingsBtns, volumeSlider, blankTextBox)
 
 		panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 		mainWindow.SetContent(panelContents)
@@ -250,9 +241,6 @@ func togglePlaylistPanel() {
 		playlistPanelOn = !playlistPanelOn
 		// draw gui w/ playlist panel
 		mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
-		settingsBtns = container.NewGridWithColumns(9, quitBtn, logoutBtn, refreshBtn, togglePlaylistPanelBtn,
-			blankTextBox, blankTextBox, blankTextBox, blankTextBox, blankTextBox)
-		settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
 
 		panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 		mainWindow.SetContent(panelContents)
