@@ -36,7 +36,7 @@ var panelContents *fyne.Container
 var mainToolbar, normalToolbar, extendedToolbar *widget.Toolbar
 var mediaCtrlPnl, mediaCtrlPlayPnl, mediaCtrlPausePnl *widget.Toolbar
 
-var volumeStatusIcon *widget.Icon
+var volumeStatusIcon, lowVolumeIcon, medVolumeIcon, highVolumeIcon *widget.Icon
 var volumeStatus *fyne.Container
 
 func initGUI() {
@@ -118,7 +118,10 @@ func initGUI() {
 	}
 
 	// volume control
-	volumeStatusIcon = widget.NewIcon(theme.VolumeUpIcon())
+	lowVolumeIcon = widget.NewIcon(theme.VolumeMuteIcon())
+	medVolumeIcon = widget.NewIcon(theme.VolumeDownIcon())
+	highVolumeIcon = widget.NewIcon(theme.VolumeUpIcon())
+	volumeStatusIcon = highVolumeIcon
 	volumeStatus = container.NewHBox(
 		container.NewGridWrap(fyne.NewSize(20, 20), volumeStatusIcon),
 		container.NewGridWrap(fyne.NewSize(190, 20), volumeSlider),
@@ -269,5 +272,37 @@ func updateMediaCtrl() {
 	}
 
 	panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
+	mainWindow.SetContent(panelContents)
+}
+
+func updateVolumeIcon() {
+	currentVolume, _ := playerCtrl.VolumePercent.Get()
+	if currentVolume < 33.0 {
+		volumeStatusIcon = lowVolumeIcon
+	} else if currentVolume >= 33.0 && currentVolume < 66.0 {
+		volumeStatusIcon = medVolumeIcon
+	} else {
+		volumeStatusIcon = highVolumeIcon
+	}
+
+	volumeStatus = container.NewHBox(
+		container.NewGridWrap(fyne.NewSize(20, 20), volumeStatusIcon),
+		container.NewGridWrap(fyne.NewSize(190, 20), volumeSlider),
+		container.NewGridWrap(fyne.NewSize(20, 20), blankTextBox),
+	)
+
+	nowPlayingWindow = container.NewCenter(
+		container.NewVBox(volumeStatus, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
+			trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
+	)
+
+	if playlistPanelOn {
+		mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
+	} else {
+		mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
+	}
+
+	panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
+
 	mainWindow.SetContent(panelContents)
 }
