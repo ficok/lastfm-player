@@ -16,6 +16,7 @@ import (
 )
 
 var playlistPanelOn = true
+var playToolbar = true
 var skipSliderVolumeUpdate = false
 
 var mainApp fyne.App
@@ -34,6 +35,9 @@ var nowPlayingWindow *fyne.Container
 var panelContents *fyne.Container
 var mainToolbar, normalToolbar, extendedToolbar *widget.Toolbar
 var mediaCtrlPnl, mediaCtrlPlayPnl, mediaCtrlPausePnl *widget.Toolbar
+
+var volumeStatusIcon *widget.Icon
+var volumeStatus *fyne.Container
 
 func initGUI() {
 	// WINDOW INIT
@@ -114,67 +118,38 @@ func initGUI() {
 	}
 
 	// volume control
-	volumeCtrl := widget.NewToolbar(
-		widget.NewToolbarAction(theme.VolumeDownIcon(), func() {
-			skipSliderVolumeUpdate = true
-			playerCtrl.setVolume(-volumeStep)
-		}),
-		widget.NewToolbarAction(theme.VolumeUpIcon(), func() {
-			skipSliderVolumeUpdate = true
-			playerCtrl.setVolume(volumeStep)
-		}),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.VolumeMuteIcon(), func() {
-			skipSliderVolumeUpdate = true
-			playerCtrl.mute()
-		}),
+	volumeStatusIcon = widget.NewIcon(theme.VolumeUpIcon())
+	volumeStatus = container.NewHBox(
+		container.NewGridWrap(fyne.NewSize(20, 20), volumeStatusIcon),
+		container.NewGridWrap(fyne.NewSize(190, 20), volumeSlider),
+		container.NewGridWrap(fyne.NewSize(20, 20), blankTextBox),
 	)
 
 	// MEDIA PANEL
 	// media control buttons
 	mediaCtrlPlayPnl = widget.NewToolbar(
+		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.MediaFastRewindIcon(), func() { seek(-seekStep) }),
 		widget.NewToolbarAction(theme.MediaSkipPreviousIcon(), previousTrack),
 		widget.NewToolbarAction(theme.MediaPlayIcon(), func() {
-			mediaCtrlPnl = mediaCtrlPausePnl
-			nowPlayingWindow = container.NewCenter(
-				container.NewVBox(volumeCtrl, volumeSlider, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
-					trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
-			)
 			togglePlay()
-			if playlistPanelOn {
-				mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
-			} else {
-				mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
-			}
-			panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
-			mainWindow.SetContent(panelContents)
 		}),
 		widget.NewToolbarAction(theme.MediaSkipNextIcon(), nextTrack),
 		widget.NewToolbarAction(theme.MediaFastForwardIcon(), func() { seek(seekStep) }),
+		widget.NewToolbarSpacer(),
 	)
 
 	mediaCtrlPausePnl = widget.NewToolbar(
+		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.MediaFastRewindIcon(), func() { seek(-seekStep) }),
 		widget.NewToolbarAction(theme.MediaSkipPreviousIcon(), previousTrack),
 		widget.NewToolbarAction(theme.MediaPauseIcon(), func() {
-			mediaCtrlPnl = mediaCtrlPlayPnl
-			nowPlayingWindow = container.NewCenter(
-				container.NewVBox(volumeCtrl, volumeSlider, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
-					trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
-			)
 			togglePlay()
-			if playlistPanelOn {
-				mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
-			} else {
-				mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
-			}
-			panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
-			mainWindow.SetContent(panelContents)
 
 		}),
 		widget.NewToolbarAction(theme.MediaSkipNextIcon(), nextTrack),
 		widget.NewToolbarAction(theme.MediaFastForwardIcon(), func() { seek(seekStep) }),
+		widget.NewToolbarSpacer(),
 	)
 
 	mediaCtrlPnl = mediaCtrlPlayPnl
@@ -193,7 +168,7 @@ func initGUI() {
 	// setting the media panel content
 	// blank text boxes used to narrow space between components; looks nicer
 	nowPlayingWindow = container.NewCenter(
-		container.NewVBox(volumeCtrl, volumeSlider, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
+		container.NewVBox(volumeStatus, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
 			trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
@@ -273,4 +248,26 @@ func togglePlaylistPanel() {
 		panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 		mainWindow.SetContent(panelContents)
 	}
+}
+
+func updateMediaCtrl() {
+	if !playerCtrl.Paused {
+		mediaCtrlPnl = mediaCtrlPausePnl
+	} else {
+		mediaCtrlPnl = mediaCtrlPlayPnl
+	}
+
+	nowPlayingWindow = container.NewCenter(
+		container.NewVBox(volumeStatus, blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox,
+			trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
+	)
+
+	if playlistPanelOn {
+		mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
+	} else {
+		mainPanel = container.NewGridWithColumns(1, nowPlayingWindow)
+	}
+
+	panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
+	mainWindow.SetContent(panelContents)
 }

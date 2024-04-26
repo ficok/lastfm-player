@@ -63,6 +63,7 @@ func playTrack(track Track) {
 
 	speaker.Play(playerCtrl)
 	setPauseStatus(false)
+	updateMediaCtrl()
 }
 
 // main func to change pause status and update play/pause button
@@ -86,6 +87,7 @@ func togglePlay() {
 	}
 
 	setPauseStatus(!playerCtrl.Paused)
+	updateMediaCtrl()
 }
 
 // main func to set global playlist index, should only be changed with this
