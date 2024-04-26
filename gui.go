@@ -16,6 +16,7 @@ import (
 )
 
 var playlistPanelOn = true
+var toolbarExtended = false
 var skipSliderVolumeUpdate = false
 
 var mainApp fyne.App
@@ -37,6 +38,7 @@ var nowPlayingWindow *fyne.Container
 var panelContents *fyne.Container
 var settingsBtns *fyne.Container
 var settingsPanel *fyne.Container
+var mainToolbar, normalToolbar, extendedToolbar *widget.Toolbar
 
 func initGUI() {
 	// WINDOW INIT
@@ -173,12 +175,38 @@ func initGUI() {
 		container.NewVBox(blankTextBox, coverArtImage, artistNameTextBox, trackTitleTextBox, trackTimeTextBox, timeProgressBar, mediaCtrlPnl, blankTextBox),
 	)
 
+	// toolbar
+	normalToolbar = widget.NewToolbar(
+		widget.NewToolbarAction(theme.SettingsIcon(), func() {
+			mainToolbar = extendedToolbar
+			panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
+			mainWindow.SetContent(panelContents)
+		}),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(theme.CancelIcon(), quit),
+	)
+
+	extendedToolbar = widget.NewToolbar(
+		widget.NewToolbarAction(theme.SettingsIcon(), func() {
+			mainToolbar = normalToolbar
+			panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
+			mainWindow.SetContent(panelContents)
+		}),
+		widget.NewToolbarAction(theme.AccountIcon(), blank),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), blank),
+		widget.NewToolbarAction(theme.ColorPaletteIcon(), togglePlaylistPanel),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(theme.CancelIcon(), quit),
+	)
+
+	mainToolbar = normalToolbar
+
 	// MAIN WINDOW
 	// panel with main objects: playlist, playing window
 	mainPanel = container.NewGridWithColumns(2, playlistList, nowPlayingWindow)
 
 	// the general panel that will hold all the content
-	panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+	panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 
 	// appending everything to the mainWindow
 	mainWindow.SetContent(panelContents)
@@ -215,7 +243,7 @@ func togglePlaylistPanel() {
 			blankTextBox, blankTextBox)
 		settingsPanel = container.NewGridWithColumns(3, settingsBtns, volumeSlider, blankTextBox)
 
-		panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+		panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 		mainWindow.SetContent(panelContents)
 	} else {
 		// now it's true
@@ -226,7 +254,7 @@ func togglePlaylistPanel() {
 			blankTextBox, blankTextBox, blankTextBox, blankTextBox, blankTextBox)
 		settingsPanel = container.NewGridWithColumns(2, settingsBtns, volumeSlider)
 
-		panelContents = container.NewBorder(settingsPanel, nil, nil, nil, mainPanel)
+		panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 		mainWindow.SetContent(panelContents)
 	}
 }
