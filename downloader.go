@@ -30,30 +30,32 @@ func downloadThread() {
 	*/
 	for {
 		fmt.Println("INFO[downloadThread]: waiting for signal from playThread")
-		// 1. wait for the signal from playThread
+		// wait for the signal from playThread
 		<-dldChannel
 		fmt.Println("INFO[downloadThread]: beginning work")
-		// 2. read the index, pop it, download it
+		// read the request
 		request, err := readFront()
 		if err != nil {
 			log.Panic(err)
 		}
 
 		fmt.Println("INFO[downloadThread]: the requested pair is:", request)
-
+		// we will start handling this request, so we pop it
 		if !downloadQueue.empty {
 			popFront()
 		}
 		fmt.Println("INFO[downloadThread]: starting download")
+		// attempt the download of the track
 		downloadTrack(playlist[request.idx].ID, &err)
 		if err != nil {
+			// if the download failed, inform the playthread
 			playChannel <- 0
 			log.Panic(err)
 		}
-		// 3. signal playThread to play
 		fmt.Println("INFO[downloadThread]: signaling to playThread to start playing")
+		// tell playThread the song is ready to be played
 		playChannel <- 1
-		// 4. send next 3 tracks to the back of the queue for in advance download
+		// download in advance: send the next 3 tracks to be downloaded
 		sent := 0
 		for id := request.idx + 1; id < request.idx+4 && id < len(playlist); id++ {
 			trackLocation := getTrackLocation(playlist[id].ID)
@@ -62,33 +64,45 @@ func downloadThread() {
 				break
 			}
 
+			// create a request
 			inAdvance := Pair{idx: id, priority: false}
+			// send it
 			pushBack(inAdvance)
 			sent++
 		}
 		fmt.Println("INFO[downloadThread]: sent", sent, "tracks to download queue.")
-		// 5. concurrently download in advance
+		// concurrently download in advance
 		go downloadTracksAhead(nrOfTracks)
 	}
 }
 
 func downloadTracksAhead(nr int) {
+	/*
+		try to download nr tracks from the back of the queue. those tracks were sent
+		for an in advance download.
+	*/
 	for i := 0; i < nr && !isEmpty(); i++ {
 		// certainly won't be empty, because if it is empty,
 		// the loop condition is unsatisfied and we exit the loop
 		pair, _ := readBack()
-		// if pair.priority == true, it was explicitly requested by the user. this is
-		// handled in downloadQueue, so we exit because it was added to the front,
-		// while here we handle tracks added from the back and therefore none such are left.
+		/*
+			if pair.priority == true, it was explicitly requested by the user and the track
+			was added to the front of the queue. this means that there are less than nr tracks
+			in the queue that should be downloaded in advance.
+
+			we will skip the priority pair, because by design it will be handled in downloadThread
+		*/
 		if pair.priority {
 			break
 		}
-
+		// pop the request
 		popBack()
 		fmt.Println("INFO[downloadAhead]: downloading", playlist[pair.idx].ID)
 		var err error
+		// attempt the download
 		downloadTrack(playlist[pair.idx].ID, &err)
 		if err != nil {
+			// print the info that the track couldn't be downloaded
 			fmt.Println("WARNING[download ahead]: could not download", playlist[pair.idx].ID)
 		}
 	}
@@ -96,8 +110,10 @@ func downloadTracksAhead(nr int) {
 }
 
 func downloadTrack(videoID string, err *error) {
+	// create the URL from the video ID that we have
 	videoURL := fmt.Sprintf("https://youtube.com/watch?v=%s", videoID)
 	fmt.Println("INFO[downloadTrack]: now downloading", videoURL)
+	// execute the ytdl program that will download and convert the video
 	*err = exec.Command("./ytdl", "--extract-audio", "--audio-format", "mp3", "--output", outputFilename, videoURL).Run()
 
 	if *err != nil {
