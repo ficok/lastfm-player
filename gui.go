@@ -192,8 +192,8 @@ func initGUI() {
 			panelContents = container.NewBorder(mainToolbar, nil, nil, nil, mainPanel)
 			mainWindow.SetContent(panelContents)
 		}),
-		widget.NewToolbarAction(theme.AccountIcon(), blank),
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), blank),
+		widget.NewToolbarAction(theme.AccountIcon(), nil),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), refreshPlaylist),
 		widget.NewToolbarAction(theme.ColorPaletteIcon(), togglePlaylistPanel),
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.CancelIcon(), quit),
@@ -222,10 +222,6 @@ func playlistCreateItem() fyne.CanvasObject {
 
 func playlistUpdateItem(idx int, item fyne.CanvasObject) {
 	item.(*widget.Label).SetText(fmt.Sprintf("%d. %s - %s", idx+1, playlist[idx].Artist, playlist[idx].Title))
-}
-
-// placeholder function
-func blank() {
 }
 
 func quit() {

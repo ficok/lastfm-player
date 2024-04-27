@@ -88,6 +88,25 @@ func readPlaylist() []Track {
 	return playlistSlice
 }
 
+func refreshPlaylist() {
+	downloadPlaylist()
+	playlist = readPlaylist()
+	setPlaylistIndex(-1)
+
+	playlistList.Refresh()
+}
+
+func expandPlaylist() {
+	downloadPlaylist()
+	playlist = append(playlist, readPlaylist()...)
+	playlistList.Refresh()
+}
+
+func playlistFileExists() bool {
+	_, err := os.Stat(playlistFile)
+	return err == nil
+}
+
 func playlistSelect(idx int) {
 	playChannel <- idx
 }

@@ -98,7 +98,7 @@ func setPlaylistIndex(idx int) {
 
 func nextTrack() {
 	if playlistIndex+1 == len(playlist) {
-		return
+		expandPlaylist()
 	}
 	playlistList.Select(playlistIndex + 1)
 }
@@ -179,7 +179,8 @@ func playThread() {
 			fmt.Println("INFO[playThread]: waiting for downloadThread...")
 			status := <-playChannel
 			if status == 0 {
-				log.Panic(errors.New("ERROR[playThread]: track unplayable"))
+				fmt.Printf("ERROR[playThread]: %d: track unplayable\n", id)
+				return
 			}
 
 			// 4. play track

@@ -48,7 +48,7 @@ func downloadThread() {
 		downloadTrack(playlist[request.idx].ID, &err)
 		if err != nil {
 			playChannel <- 0
-			log.Panic(err)
+			fmt.Println(err)
 		}
 		// 3. signal playThread to play
 		fmt.Println("INFO[downloadThread]: signaling to playThread to start playing")

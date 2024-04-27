@@ -90,6 +90,9 @@ func main() {
 	if !validateConfig() {
 		loginWindow.Show()
 	} else {
+		if !playlistFileExists() {
+			downloadPlaylist()
+		}
 		playlist = readPlaylist()
 		playChannel <- 1
 		mainWindow.Show()
