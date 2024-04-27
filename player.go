@@ -211,6 +211,12 @@ func playThread() {
 }
 
 func trackTime() {
+	/*
+		playThread will send a stop signal when it is activated by a play request.
+		when that happens, we will wait here for a continue signal.
+
+		if the request has not been caught, that means we can safely continue working.
+	*/
 	for {
 		select {
 		case <-timeChannelStop:
@@ -218,25 +224,33 @@ func trackTime() {
 		default:
 		}
 
-		// printing currently playing time info
 		if playerCtrl.Streamer == nil {
 			continue
 		}
 
-		// currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-		// totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
-
-		// currentTime := getTimeString(currentTimeInt)
-		// totalTime := getTimeString(totalTimeInt)
-
+		// get the elapsed time in seconds from streamer and save it in playerCtrl.currentTime
 		playerCtrl.currentTime = playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		/*
+			set the progress bar value.
+			we are not using a binding because this way, clicking and moving the slider is disabled
+		*/
 		timeProgressBar.Value = float64(playerCtrl.currentTime)
+		// refresh to render the change
 		timeProgressBar.Refresh()
-		// playerCtrl.currentTime.Set(float64(currentTime))
 
+		// update the time label
 		trackTimeText.Set(fmt.Sprintf("%s/%s", getTimeString(playerCtrl.currentTime), getTimeString(playerCtrl.totalTime)))
 
-		// ensure we never skip a track
+		/*
+			ensure we never skip a track
+			without this, it sometimes happens that when the new track is started
+			information about the current streamer position and length hasn't yet been
+			updated. this causes the if to pass and plays the next song, thus skipping the
+			real next song.
+
+			this way the first time we try to play the next song, we send a skip signal
+			to this thread. the next iteration will receive the signal and skip playing the next song.
+		*/
 		select {
 		case <-playingNextTrackChannel:
 		// if something is received, that means that in the previous iteration, a new
