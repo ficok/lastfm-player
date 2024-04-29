@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"time"
 
 	"github.com/gopxl/beep/mp3"
@@ -254,4 +255,13 @@ func fileExists(filePath string) bool {
 
 func getTrackLocation(videoID string) string {
 	return fmt.Sprint(tracksDir, videoID, ".mp3")
+}
+
+func deleteDownloadedTracks() {
+	dirEntry, _ := os.ReadDir(tracksDir)
+	for _, file := range dirEntry {
+		if path.Ext(file.Name()) == ".mp3" {
+			os.Remove(fmt.Sprint(tracksDir, file.Name()))
+		}
+	}
 }

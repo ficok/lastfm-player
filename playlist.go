@@ -89,6 +89,7 @@ func readPlaylist() []Track {
 }
 
 func refreshPlaylist() {
+	deleteDownloadedTracks()
 	downloadPlaylist()
 	playlist = readPlaylist()
 	setPlaylistIndex(-1)
