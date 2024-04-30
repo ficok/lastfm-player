@@ -16,7 +16,6 @@ import (
 )
 
 var playlistPanelOn = true
-var playToolbar = true
 var skipSliderVolumeUpdate = false
 
 var mainApp fyne.App

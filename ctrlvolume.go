@@ -78,21 +78,18 @@ func (cv *CtrlVolume) setVolume(volumeChange float64) {
 	fmt.Println("- cv.Volume is", newVolume)
 
 	if oldVolume < 33.0 && newVolume >= 33.0 {
-		fmt.Println("old volume was less than 33, new is more")
 		updateVolumeIcon()
 		return
 	}
 
 	if oldVolume >= 33.0 && oldVolume < 66.0 {
 		if newVolume < 33.0 || newVolume >= 66.0 {
-			fmt.Println("old volume was between 33 and 66, new one is either less than 33 or larger than 66")
 			updateVolumeIcon()
 			return
 		}
 	}
 
 	if oldVolume >= 66.0 && newVolume < 66.0 {
-		fmt.Println("old volume was more than 66, new one is less")
 		updateVolumeIcon()
 		return
 	}

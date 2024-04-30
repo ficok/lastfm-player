@@ -136,44 +136,61 @@ func seek(change int) {
 }
 
 func playThread() {
-	// waiting for the playlist to become ready
+	/*
+		this part of the thread will try to download the first track of the playlist, in case
+		it has not been downloaded yet
+	*/
+	// waiting for the signal that the playlist is ready (initGUI, after readPlaylist)
 	fmt.Println("INFO[playThread]: waiting for playlist to become ready...")
 	<-playChannel
 	fmt.Println("INFO[playThread]: making the first track ready...")
+	// trying to stat the song file
 	trackLocation := getTrackLocation(playlist[0].ID)
 	if _, statErr := os.Stat(trackLocation); statErr != nil {
+		// if it doesn't exist, create a priority download request
 		request := Pair{idx: 0, priority: true}
+		// send the request
 		pushFront(request)
+		// signal to download thread to start downloading
 		dldChannel <- true
+		// wait for the download status from download thread
 		status := <-playChannel
 		if status == 0 {
+			// couldn't download the song
 			fmt.Println("WARNING[playThread]: couldn't download the first track in advance.")
 		}
 	}
 
+	/*
+		this part of the thread waits for a play request. it tries to play the requested track,
+		but if it has not been downloaded, sends a download requst for it.
+		then it waits for the request to be completed and plays the requestd track when it
+		become available.
+	*/
 	for {
 		fmt.Println("INFO[playThread]: waiting for play request")
 		// while waiting, timeThread can keep on working
-		// 1. wait for a new play request
+		// wait for a new play request
 		id := <-playChannel
 		// when a new song is requested, timeChannel is blocked until the song starts
 		timeChannelStop <- true
 		fmt.Println("INFO[playThread]: started working")
-		// 2. stat the file
+		// stat the file
 		trackLocation := getTrackLocation(playlist[id].ID)
-		// 3. if available, play
+		// if available, play
 		if _, statErr := os.Stat(trackLocation); statErr == nil {
 			setPlaylistIndex(id)
 			playTrack(playlist[playlistIndex])
-			// start the time thread
+			// tell the trackTime thread to continue working
 			timeChannelGo <- true
 
-			// 4. if unavailable, send to download queue and wait on semaphore
+			// if unavailable, send to download queue and wait while it downloads
 		} else {
-			// send to front of the queue
+			// create a priority download request
 			request := Pair{idx: id, priority: true}
+			// send the request
 			pushFront(request)
-			// signal the downloadThread to proceed
+			// signal the downloadThread to start downloading
 			fmt.Println("INFO[playThread]: requesting download of track", playlist[id].ID)
 			dldChannel <- true
 			// wait for the track to become available
@@ -184,17 +201,23 @@ func playThread() {
 				return
 			}
 
-			// 4. play track
+			// play track
 			fmt.Println("INFO[playThread]: finally playing!")
 			setPlaylistIndex(id)
 			playTrack(playlist[playlistIndex])
-			// start the time thread
+			// tell the time thread to continue playing
 			timeChannelGo <- true
 		}
 	}
 }
 
 func trackTime() {
+	/*
+		playThread will send a stop signal when it is activated by a play request.
+		when that happens, we will wait here for a continue signal.
+
+		if the request has not been caught, that means we can safely continue working.
+	*/
 	for {
 		select {
 		case <-timeChannelStop:
@@ -202,25 +225,33 @@ func trackTime() {
 		default:
 		}
 
-		// printing currently playing time info
 		if playerCtrl.Streamer == nil {
 			continue
 		}
 
-		// currentTimeInt := playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
-		// totalTimeInt := playerCtrl.Streamer.Len() / sampleRate.N(time.Second)
-
-		// currentTime := getTimeString(currentTimeInt)
-		// totalTime := getTimeString(totalTimeInt)
-
+		// get the elapsed time in seconds from streamer and save it in playerCtrl.currentTime
 		playerCtrl.currentTime = playerCtrl.Streamer.Position() / sampleRate.N(time.Second)
+		/*
+			set the progress bar value.
+			we are not using a binding because this way, clicking and moving the slider is disabled
+		*/
 		timeProgressBar.Value = float64(playerCtrl.currentTime)
+		// refresh to render the change
 		timeProgressBar.Refresh()
-		// playerCtrl.currentTime.Set(float64(currentTime))
 
+		// update the time label
 		trackTimeText.Set(fmt.Sprintf("%s/%s", getTimeString(playerCtrl.currentTime), getTimeString(playerCtrl.totalTime)))
 
-		// ensure we never skip a track
+		/*
+			ensure we never skip a track
+			without this, it sometimes happens that when the new track is started
+			information about the current streamer position and length hasn't yet been
+			updated. this causes the if to pass and plays the next song, thus skipping the
+			real next song.
+
+			this way the first time we try to play the next song, we send a skip signal
+			to this thread. the next iteration will receive the signal and skip playing the next song.
+		*/
 		select {
 		case <-playingNextTrackChannel:
 		// if something is received, that means that in the previous iteration, a new
